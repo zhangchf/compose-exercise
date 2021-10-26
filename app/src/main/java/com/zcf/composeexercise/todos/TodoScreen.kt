@@ -26,7 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.zcf.composeexercise.Pages
+import com.zcf.composeexercise.MainScreenRoutes
 import com.zcf.composeexercise.todos.viewmodel.TodosViewModel
 
 @Composable
@@ -57,17 +57,17 @@ fun TodosListView(
           Icon(
             imageVector = Icons.Filled.AccountBox,
             contentDescription = "Tab 1",
-            modifier = Modifier.padding(4.dp).clickable { navController.navigate(Pages.TestPage1.route) }
+            modifier = Modifier.padding(4.dp).clickable { navController.navigate(MainScreenRoutes.TestPage1.route) }
           )
           Icon(
             imageVector = Icons.Filled.Create,
             contentDescription = "Tab 2",
-            modifier = Modifier.padding(4.dp).clickable { navController.navigate(Pages.TestPage2.route) }
+            modifier = Modifier.padding(4.dp).clickable { navController.navigate(MainScreenRoutes.TestPage2.route) }
           )
           Icon(
             imageVector = Icons.Filled.Person,
             contentDescription = "Canvas",
-            modifier = Modifier.padding(4.dp).clickable { navController.navigate(Pages.CanvasPage.route) }
+            modifier = Modifier.padding(4.dp).clickable { navController.navigate(MainScreenRoutes.CanvasPage.route) }
           )
         }
 
