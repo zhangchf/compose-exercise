@@ -17,6 +17,8 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Create
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -24,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.zcf.composeexercise.Pages
 import com.zcf.composeexercise.todos.viewmodel.TodosViewModel
 
 @Composable
@@ -54,12 +57,17 @@ fun TodosListView(
           Icon(
             imageVector = Icons.Filled.AccountBox,
             contentDescription = "Tab 1",
-            modifier = Modifier.padding(4.dp).clickable { navController.navigate("testPage1") }
+            modifier = Modifier.padding(4.dp).clickable { navController.navigate(Pages.TestPage1.route) }
           )
           Icon(
             imageVector = Icons.Filled.Create,
             contentDescription = "Tab 2",
-            modifier = Modifier.padding(4.dp).clickable { navController.navigate("testPage2") }
+            modifier = Modifier.padding(4.dp).clickable { navController.navigate(Pages.TestPage2.route) }
+          )
+          Icon(
+            imageVector = Icons.Filled.Person,
+            contentDescription = "Canvas",
+            modifier = Modifier.padding(4.dp).clickable { navController.navigate(Pages.CanvasPage.route) }
           )
         }
 

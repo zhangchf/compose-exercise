@@ -3,39 +3,21 @@ package com.zcf.composeexercise
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Checkbox
-import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
-import androidx.navigation.NavHostController
-import androidx.navigation.NavType
-import androidx.navigation.NavType.Companion
+import androidx.navigation.*
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navArgument
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navDeepLink
 import com.zcf.composeexercise.Pages.Todos
 import com.zcf.composeexercise.pages.TestPage1
 import com.zcf.composeexercise.pages.TestPage2
+import com.zcf.composeexercise.pages.canvasPage
 import com.zcf.composeexercise.todos.TodoItem
 import com.zcf.composeexercise.todos.TodosListView
 import com.zcf.composeexercise.ui.theme.ComposeExerciseTheme
-import com.zcf.composeexercise.todos.viewmodel.TodosViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 const val URI_HOST = "https://zcf.com"
@@ -54,22 +36,22 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-enum class Pages(val id: String) {
+enum class Pages(val route: String) {
     Todos("todos"),
-    TodoItem("todoItem/{itemId}"),
+    TodoItem("todoItem"),
     TestPage1("testPage1"),
-    TestPage2("testPage2")
+    TestPage2("testPage2"),
+    CanvasPage("canvasPage")
 }
 
 @Composable
 fun Router(navController: NavHostController) {
-    NavHost(navController = navController, startDestination = Todos.id) {
+    NavHost(navController = navController, startDestination = Todos.route) {
         composable("todos") {
             TodosListView(navController = navController)
         }
-
         composable(
-            route = "todoItem/{itemId}",
+            route = "${Pages.TodoItem.route}/{itemId}",
             arguments = listOf(navArgument("itemId") {
                 this.type = NavType.IntType
             }),
@@ -80,13 +62,19 @@ fun Router(navController: NavHostController) {
             val arguments = backStackEntry.arguments
             TodoItem(itemId = arguments?.getInt("itemId"), navController = navController)
         }
-
-        composable("testPage1") {
+        composable(Pages.TestPage1.route) {
             TestPage1(navController = navController)
         }
-
-        composable("testPage2") {
+        composable(Pages.TestPage2.route) {
             TestPage2(navController = navController)
+        }
+        composable(Pages.CanvasPage.route) {
+            canvasPage(navController = navController)
+        }
+        //nested navigation graph
+        navigation("login", route = "loginFlow") {
+            composable("login") {}
+            composable("signUp") {}
         }
     }
 }
