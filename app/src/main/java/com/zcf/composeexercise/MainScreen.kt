@@ -3,7 +3,6 @@ package com.zcf.composeexercise
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Button
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
@@ -14,9 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.*
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navArgument
-import com.zcf.composeexercise.pages.TestPage1
-import com.zcf.composeexercise.pages.TestPage2
-import com.zcf.composeexercise.pages.canvasPage
+import com.zcf.composeexercise.pages.*
 import com.zcf.composeexercise.todos.TodoItem
 import com.zcf.composeexercise.todos.TodosListView
 
@@ -37,16 +34,27 @@ fun MainScreen(navController: NavController) {
             Button(onClick = { navController.navigate(MainScreenRoutes.Todos.route) }) {
                 Text("Todos LazyColumn")
             }
-            Button(onClick = { navController.navigate(MainScreenRoutes.TestPage1.route) }) {
+            Button(onClick = { navController.navigate(MainScreenRoutes.StatesPage.route) }) {
                 Text(text = "States")
             }
-            Button(onClick = { navController.navigate(MainScreenRoutes.TestPage2.route) }) {
+            Button(onClick = { navController.navigate(MainScreenRoutes.SideEffectsPage.route) }) {
                 Text(text = "Effects and Croroutine Scopes")
             }
             Button(onClick = { navController.navigate(MainScreenRoutes.CanvasPage.route) }) {
                 Text(text = "Canvas")
             }
-            
+            Button(onClick = { navController.navigate(MainScreenRoutes.GesturesPage.route)}) {
+                Text("Gestures")
+            }
+            Button(onClick = { navController.navigate(MainScreenRoutes.CompositionLocal.route) }) {
+                Text("CompositionLocal")
+            }
+            Button(onClick = { navController.navigate(MainScreenRoutes.ChessPage.route) }) {
+                Text("Chess")
+            }
+            Button(onClick = { navController.navigate(MainScreenRoutes.Animation.route) }) {
+                Text("Animation")
+            }
         }
         
     }
@@ -57,9 +65,13 @@ enum class MainScreenRoutes(val route: String) {
     Root("mainScreen"),
     Todos("todos"),
     TodoItem("todoItem"),
-    TestPage1("testPage1"),
-    TestPage2("testPage2"),
-    CanvasPage("canvasPage")
+    StatesPage("statesPage"),
+    SideEffectsPage("sideEffectsPage"),
+    CanvasPage("canvasPage"),
+    GesturesPage("gesturesPage"),
+    CompositionLocal("compositionLocal"),
+    ChessPage("chessPage"),
+    Animation("animation")
 }
 
 fun NavGraphBuilder.mainScreenNavGraph(navController: NavController) {
@@ -84,20 +96,26 @@ fun NavGraphBuilder.mainScreenNavGraph(navController: NavController) {
             TodoItem(itemId = arguments?.getInt("itemId"), navController = navController)
         }
 
-        composable(MainScreenRoutes.TestPage1.route) {
-            TestPage1(navController = navController)
+        composable(MainScreenRoutes.StatesPage.route) {
+            StatesPage(navController = navController)
         }
-        composable(MainScreenRoutes.TestPage2.route) {
-            TestPage2(navController = navController)
+        composable(MainScreenRoutes.SideEffectsPage.route) {
+            SideEffectsPage(navController = navController)
         }
         composable(MainScreenRoutes.CanvasPage.route) {
             canvasPage(navController = navController)
         }
-
-        //nested navigation graph
-        navigation("login", route = "loginFlow") {
-            composable("login") {}
-            composable("signUp") {}
+        composable(MainScreenRoutes.GesturesPage.route) {
+            GesturesPage()
+        }
+        composable(MainScreenRoutes.CompositionLocal.route) {
+            CompositionLocalPage()
+        }
+        composable(MainScreenRoutes.ChessPage.route) {
+            ChessPage()
+        }
+        composable(MainScreenRoutes.Animation.route) {
+            animationPage()
         }
     }
 }

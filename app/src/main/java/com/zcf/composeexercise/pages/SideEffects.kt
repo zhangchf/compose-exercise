@@ -8,7 +8,7 @@ import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 
 @Composable
-fun TestPage2(navController: NavController, scaffoldState: ScaffoldState = rememberScaffoldState()) {
+fun SideEffectsPage(navController: NavController, scaffoldState: ScaffoldState = rememberScaffoldState()) {
 
     LaunchedEffect(key1 = scaffoldState.snackbarHostState) {
         scaffoldState.snackbarHostState.showSnackbar("Hello, I'm LaunchedEffect!", "click")

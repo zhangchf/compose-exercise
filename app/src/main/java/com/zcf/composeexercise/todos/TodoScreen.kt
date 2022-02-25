@@ -1,34 +1,39 @@
 package com.zcf.composeexercise.todos
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.BottomAppBar
-import androidx.compose.material.Checkbox
-import androidx.compose.material.Icon
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBox
-import androidx.compose.material.icons.filled.Create
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.Alignment
+import androidx.compose.material.icons.filled.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.zcf.composeexercise.MainScreenRoutes
+import com.zcf.composeexercise.todos.BottomNavScreen.*
 import com.zcf.composeexercise.todos.viewmodel.TodosViewModel
 
+
+sealed class BottomNavScreen(val title: String, val icon: ImageVector, val route: String) {
+  object TextFieldPage : BottomNavScreen("TextField", Icons.Filled.Person, MainScreenRoutes.StatesPage.route)
+  object SnackBarPage : BottomNavScreen("SnackBar", Icons.Filled.Call, MainScreenRoutes.SideEffectsPage.route)
+  object CanvasPage : BottomNavScreen("Canvas", Icons.Filled.AccountBox, MainScreenRoutes.CanvasPage.route)
+}
+
+val BOTTOM_NAV_ITEMS = listOf(
+  TextFieldPage, SnackBarPage, CanvasPage
+)
+
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun TodosListView(
   navController: NavController,
@@ -37,7 +42,6 @@ fun TodosListView(
   LaunchedEffect(key1 = null) {
     viewModel.getTodos()
   }
-
 
   Scaffold(
     topBar = {
@@ -48,32 +52,41 @@ fun TodosListView(
       }
     },
     bottomBar = {
-      BottomAppBar() {
-        Row(
-          modifier = Modifier.fillMaxSize(),
-          horizontalArrangement = Arrangement.SpaceEvenly,
-          verticalAlignment = Alignment.CenterVertically
+      BottomAppBar(
+        modifier = Modifier.clip(RoundedCornerShape(8.dp, 8.dp)),
+        cutoutShape = CircleShape
+      ) {
+
+        BottomNavigation(
         ) {
-          Icon(
-            imageVector = Icons.Filled.AccountBox,
-            contentDescription = "Tab 1",
-            modifier = Modifier.padding(4.dp).clickable { navController.navigate(MainScreenRoutes.TestPage1.route) }
-          )
-          Icon(
-            imageVector = Icons.Filled.Create,
-            contentDescription = "Tab 2",
-            modifier = Modifier.padding(4.dp).clickable { navController.navigate(MainScreenRoutes.TestPage2.route) }
-          )
-          Icon(
-            imageVector = Icons.Filled.Person,
-            contentDescription = "Canvas",
-            modifier = Modifier.padding(4.dp).clickable { navController.navigate(MainScreenRoutes.CanvasPage.route) }
-          )
+
+          BOTTOM_NAV_ITEMS.forEach { screen ->
+            BottomNavigationItem(
+              selected = false,
+              onClick = { navController.navigate(screen.route) },
+              icon = {
+                Icon(
+                  imageVector = screen.icon,
+                  contentDescription = screen.title,
+                  modifier = Modifier
+                    .padding(4.dp)
+                )
+              },
+              label = {
+                Text(text = screen.title)
+              }
+            )
+          }
         }
-
       }
-    }
-
+    },
+    floatingActionButton = {
+      FloatingActionButton(onClick = {  }) {
+        Icon(imageVector = Icons.Default.Create, contentDescription = "Create")
+      }
+    },
+    floatingActionButtonPosition = FabPosition.End,
+    isFloatingActionButtonDocked = true
   ) {
 
     val errorMsg = viewModel.errorMsg.value
@@ -82,24 +95,38 @@ fun TodosListView(
         modifier = Modifier.padding(horizontal = 16.dp)
       ) {
         items(viewModel.todos) {
-          Row(
-            modifier = Modifier
-              .fillMaxWidth()
-              .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
-          ) {
-            Text(
-              text = it.title,
+          Column {
+            var isExpanded by remember {
+              mutableStateOf(false)
+            }
+
+            Row(
               modifier = Modifier
-                .weight(1f)
-                .clickable { navController.navigate("todoItem/${it.id}") }
-            )
-            Checkbox(
-              checked = it.completed,
-              onCheckedChange = null,
-              modifier = Modifier.padding(start = 16.dp)
-            )
+                .fillMaxWidth()
+                .clickable { isExpanded = !isExpanded }
+                .padding(16.dp),
+              horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+              Text(
+                text = it.title,
+                modifier = Modifier
+                  .weight(1f)
+                  .clickable { navController.navigate("todoItem/${it.id}") }
+              )
+              Checkbox(
+                checked = it.completed,
+                onCheckedChange = null,
+                modifier = Modifier.padding(start = 16.dp)
+              )
+            }
+
+            AnimatedVisibility(visible = isExpanded) {
+              Text(text = "Expandable area", modifier = Modifier.padding(32.dp, 0.dp, 16.dp, 8.dp))
+            }
+
+            Divider()
           }
+
         }
       }
     } else {
