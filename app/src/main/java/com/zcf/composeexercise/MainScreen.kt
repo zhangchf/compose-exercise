@@ -55,6 +55,9 @@ fun MainScreen(navController: NavController) {
             Button(onClick = { navController.navigate(MainScreenRoutes.Animation.route) }) {
                 Text("Animation")
             }
+            Button(onClick = { navController.navigate(MainScreenRoutes.BackdropScaffold.route) }) {
+                Text("BackdropScaffold")
+            }
         }
         
     }
@@ -71,7 +74,8 @@ enum class MainScreenRoutes(val route: String) {
     GesturesPage("gesturesPage"),
     CompositionLocal("compositionLocal"),
     ChessPage("chessPage"),
-    Animation("animation")
+    Animation("animation"),
+    BackdropScaffold("backdropScaffold"),
 }
 
 fun NavGraphBuilder.mainScreenNavGraph(navController: NavController) {
@@ -116,6 +120,9 @@ fun NavGraphBuilder.mainScreenNavGraph(navController: NavController) {
         }
         composable(MainScreenRoutes.Animation.route) {
             animationPage()
+        }
+        composable(MainScreenRoutes.BackdropScaffold.route) {
+            backdropScaffoldPage()
         }
     }
 }
