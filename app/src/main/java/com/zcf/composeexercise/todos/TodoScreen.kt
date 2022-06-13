@@ -24,9 +24,9 @@ import com.zcf.composeexercise.todos.viewmodel.TodosViewModel
 
 
 sealed class BottomNavScreen(val title: String, val icon: ImageVector, val route: String) {
-  object TextFieldPage : BottomNavScreen("TextField", Icons.Filled.Person, MainScreenRoutes.StatesPage.route)
-  object SnackBarPage : BottomNavScreen("SnackBar", Icons.Filled.Call, MainScreenRoutes.SideEffectsPage.route)
-  object CanvasPage : BottomNavScreen("Canvas", Icons.Filled.AccountBox, MainScreenRoutes.CanvasPage.route)
+  object TextFieldPage : BottomNavScreen("TextField", Icons.Filled.Person, MainScreenRoutes.StatesPage.key)
+  object SnackBarPage : BottomNavScreen("SnackBar", Icons.Filled.Call, MainScreenRoutes.SideEffectsPage.key)
+  object CanvasPage : BottomNavScreen("Canvas", Icons.Filled.AccountBox, MainScreenRoutes.CanvasPage.key)
 }
 
 val BOTTOM_NAV_ITEMS = listOf(

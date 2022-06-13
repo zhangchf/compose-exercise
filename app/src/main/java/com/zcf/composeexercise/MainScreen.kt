@@ -1,8 +1,9 @@
 package com.zcf.composeexercise
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Button
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
@@ -12,7 +13,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.*
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.navArgument
 import com.zcf.composeexercise.pages.*
 import com.zcf.composeexercise.todos.TodoItem
 import com.zcf.composeexercise.todos.TodosListView
@@ -26,56 +26,32 @@ fun MainScreen(navController: NavController) {
             }
         }
     ) {
-        Column(
+        LazyColumn(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.SpaceEvenly,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Button(onClick = { navController.navigate(MainScreenRoutes.Todos.route) }) {
-                Text("Todos LazyColumn")
-            }
-            Button(onClick = { navController.navigate(MainScreenRoutes.StatesPage.route) }) {
-                Text(text = "States")
-            }
-            Button(onClick = { navController.navigate(MainScreenRoutes.SideEffectsPage.route) }) {
-                Text(text = "Effects and Croroutine Scopes")
-            }
-            Button(onClick = { navController.navigate(MainScreenRoutes.CanvasPage.route) }) {
-                Text(text = "Canvas")
-            }
-            Button(onClick = { navController.navigate(MainScreenRoutes.GesturesPage.route)}) {
-                Text("Gestures")
-            }
-            Button(onClick = { navController.navigate(MainScreenRoutes.CompositionLocal.route) }) {
-                Text("CompositionLocal")
-            }
-            Button(onClick = { navController.navigate(MainScreenRoutes.ChessPage.route) }) {
-                Text("Chess")
-            }
-            Button(onClick = { navController.navigate(MainScreenRoutes.Animation.route) }) {
-                Text("Animation")
-            }
-            Button(onClick = { navController.navigate(MainScreenRoutes.BackdropScaffold.route) }) {
-                Text("BackdropScaffold")
+            items(MainScreenRoutes.values()) { route ->
+                Button(onClick = { navController.navigate(route.key) }) {
+                    Text(route.displayName)
+                }
             }
         }
         
     }
 }
 
-
-enum class MainScreenRoutes(val route: String) {
-    Root("mainScreen"),
-    Todos("todos"),
-    TodoItem("todoItem"),
-    StatesPage("statesPage"),
-    SideEffectsPage("sideEffectsPage"),
-    CanvasPage("canvasPage"),
-    GesturesPage("gesturesPage"),
-    CompositionLocal("compositionLocal"),
-    ChessPage("chessPage"),
-    Animation("animation"),
-    BackdropScaffold("backdropScaffold"),
+enum class MainScreenRoutes(val key: String, val displayName: String) {
+    Todos("todos", "Todos LazyColumn"),
+    StatesPage("statesPage", "States"),
+    SideEffectsPage("sideEffectsPage", "Effects and Croroutine Scopes"),
+    CanvasPage("canvasPage", "Canvas"),
+    GesturesPage("gesturesPage", "Gestures"),
+    CompositionLocal("compositionLocal", "CompositionLocal"),
+    ChessPage("chessPage", "Chess"),
+    Animation("animation", "Animation"),
+    BackdropScaffold("backdropScaffold", "BackdropScaffold"),
+    MirrorPage("mirrorPage", "Mirror Effect")
 }
 
 fun NavGraphBuilder.mainScreenNavGraph(navController: NavController) {
@@ -83,12 +59,12 @@ fun NavGraphBuilder.mainScreenNavGraph(navController: NavController) {
         composable("mainScreenHomePage") {
             MainScreen(navController = navController)
         }
-        composable(MainScreenRoutes.Todos.route) {
+        composable(MainScreenRoutes.Todos.key) {
             TodosListView(navController = navController)
         }
 
         composable(
-            route = "${MainScreenRoutes.TodoItem.route}/{itemId}",
+            route = "todoItem/{itemId}",
             arguments = listOf(navArgument("itemId") {
                 this.type = NavType.IntType
             }),
@@ -100,29 +76,32 @@ fun NavGraphBuilder.mainScreenNavGraph(navController: NavController) {
             TodoItem(itemId = arguments?.getInt("itemId"), navController = navController)
         }
 
-        composable(MainScreenRoutes.StatesPage.route) {
+        composable(MainScreenRoutes.StatesPage.key) {
             StatesPage(navController = navController)
         }
-        composable(MainScreenRoutes.SideEffectsPage.route) {
+        composable(MainScreenRoutes.SideEffectsPage.key) {
             SideEffectsPage(navController = navController)
         }
-        composable(MainScreenRoutes.CanvasPage.route) {
+        composable(MainScreenRoutes.CanvasPage.key) {
             canvasPage(navController = navController)
         }
-        composable(MainScreenRoutes.GesturesPage.route) {
+        composable(MainScreenRoutes.GesturesPage.key) {
             GesturesPage()
         }
-        composable(MainScreenRoutes.CompositionLocal.route) {
+        composable(MainScreenRoutes.CompositionLocal.key) {
             CompositionLocalPage()
         }
-        composable(MainScreenRoutes.ChessPage.route) {
+        composable(MainScreenRoutes.ChessPage.key) {
             ChessPage()
         }
-        composable(MainScreenRoutes.Animation.route) {
+        composable(MainScreenRoutes.Animation.key) {
             animationPage()
         }
-        composable(MainScreenRoutes.BackdropScaffold.route) {
+        composable(MainScreenRoutes.BackdropScaffold.key) {
             backdropScaffoldPage()
+        }
+        composable(MainScreenRoutes.MirrorPage.key) {
+            MirrorPage()
         }
     }
 }

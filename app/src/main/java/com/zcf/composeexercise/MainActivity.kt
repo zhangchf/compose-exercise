@@ -33,7 +33,7 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun Router(navController: NavHostController) {
-    NavHost(navController = navController, startDestination = MainScreenRoutes.Root.route) {
+    NavHost(navController = navController, startDestination = "mainScreen") {
         mainScreenNavGraph(navController = navController)
 
         //nested navigation graph
