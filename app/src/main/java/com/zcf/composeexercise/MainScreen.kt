@@ -51,7 +51,8 @@ enum class MainScreenRoutes(val key: String, val displayName: String) {
     ChessPage("chessPage", "Chess"),
     Animation("animation", "Animation"),
     BackdropScaffold("backdropScaffold", "BackdropScaffold"),
-    MirrorPage("mirrorPage", "Mirror Effect")
+    MirrorPage("mirrorPage", "Mirror Effect"),
+    ParallaxPage("parallaxPage", "Parallax")
 }
 
 fun NavGraphBuilder.mainScreenNavGraph(navController: NavController) {
@@ -102,6 +103,9 @@ fun NavGraphBuilder.mainScreenNavGraph(navController: NavController) {
         }
         composable(MainScreenRoutes.MirrorPage.key) {
             MirrorPage()
+        }
+        composable(MainScreenRoutes.ParallaxPage.key) {
+            ParallaxPage()
         }
     }
 }
