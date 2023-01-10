@@ -1,6 +1,7 @@
 package com.zcf.composeexercise
 
 import org.junit.Test
+import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.util.*
 
@@ -631,5 +632,32 @@ class CurrencyFormatLegacyTest {
         println(formatter.format(-2100.95))
         formatter.currency = Currency.getInstance("AUD")
         println(formatter.format(-2100.95))
+    }
+
+    @Test
+    fun customCurrencySymbol() {
+        println("========= French Locale with $ as currencySymbol ============")
+        val formatter = NumberFormat.getCurrencyInstance(Locale.FRENCH)
+        formatter.currency = Currency.getInstance(Locale.US)
+//        (formatter as DecimalFormat).decimalFormatSymbols.currencySymbol = "$"
+        val symbols = (formatter as DecimalFormat).decimalFormatSymbols
+        symbols.currencySymbol = "$"
+        (formatter as DecimalFormat).decimalFormatSymbols = symbols
+        println(formatter.format(2100.10))
+
+        formatter.currency = Currency.getInstance(Locale.CHINA)
+        println(formatter.format(2100.95))
+        formatter.currency = Currency.getInstance(Locale.JAPAN)
+        println(formatter.format(2100.95))
+        formatter.currency = Currency.getInstance(Locale.GERMANY)
+        println(formatter.format(2100.95))
+        formatter.currency = Currency.getInstance(Locale.CANADA)
+        println(formatter.format(2100.95))
+        formatter.currency = Currency.getInstance(Locale.forLanguageTag("en-AU"))
+        println(formatter.format(2100.95))
+    }
+
+    private fun println(msg: String) {
+        System.out.println("zcf $msg")
     }
 }

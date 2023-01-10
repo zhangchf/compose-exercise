@@ -3,17 +3,22 @@ package com.zcf.composeexercise.pages
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.platform.LocalDensity
-import kotlin.math.PI
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.ExperimentalTextApi
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.sp
+import com.zcf.composeexercise.R
 import kotlin.math.sin
 
 data class Star(
@@ -30,8 +35,11 @@ data class Star(
 }
 
 @Composable
-fun animationPage() {
-    Space()
+fun AnimationPage() {
+    Column {
+        Space()
+        BrushColorAnimatingText()
+    }
 }
 
 @OptIn(ExperimentalStdlibApi::class)
@@ -51,7 +59,9 @@ fun Space(
     )
 
     BoxWithConstraints(
-        modifier = modifier.fillMaxWidth().aspectRatio(1f)
+        modifier = modifier
+            .fillMaxWidth()
+            .aspectRatio(1f)
     ) {
         val density = LocalDensity.current
         val width = with(density) { maxWidth.toPx() }
@@ -84,4 +94,34 @@ fun Space(
             }
         }
     }
+}
+
+@OptIn(ExperimentalTextApi::class)
+@Composable
+fun BrushColorAnimatingText() {
+    val fontSize = 14.sp
+    val currentFontSizePx = with(LocalDensity.current) { fontSize.toPx() }
+    val currentFontSizeDoublePx = currentFontSizePx * 2
+
+    val infiniteTransition = rememberInfiniteTransition()
+    val offset by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = currentFontSizeDoublePx,
+        animationSpec = infiniteRepeatable(tween(1000, easing = LinearEasing))
+    )
+
+    val brush = Brush.linearGradient(
+        colors = listOf(Color.Blue, Color.Magenta),
+        start = Offset(offset, offset),
+        end = Offset(offset + currentFontSizePx, offset + currentFontSizePx),
+        tileMode = TileMode.Mirror
+    )
+
+    Text(
+        text = stringResource(id = R.string.loremIpsum),
+        style = TextStyle(
+            brush = brush,
+            fontSize = fontSize
+        )
+    )
 }

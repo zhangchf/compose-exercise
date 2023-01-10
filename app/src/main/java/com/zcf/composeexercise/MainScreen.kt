@@ -11,6 +11,7 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.*
 import androidx.navigation.compose.composable
 import com.zcf.composeexercise.pages.*
@@ -22,7 +23,7 @@ fun MainScreen(navController: NavController) {
     Scaffold(
         topBar = {
             TopAppBar {
-                Text(text = "Main Screen")
+                Text(text = stringResource(id = R.string.mainScreenTitle))
             }
         }
     ) {
@@ -96,7 +97,7 @@ fun NavGraphBuilder.mainScreenNavGraph(navController: NavController) {
             ChessPage()
         }
         composable(MainScreenRoutes.Animation.key) {
-            animationPage()
+            AnimationPage()
         }
         composable(MainScreenRoutes.BackdropScaffold.key) {
             backdropScaffoldPage()
