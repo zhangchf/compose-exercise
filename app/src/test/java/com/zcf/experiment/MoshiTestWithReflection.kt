@@ -14,7 +14,9 @@ class MoshiTestWithReflection {
     data class RefModel2(
         val name: String,
         val age: Int,
-        val isValid: Boolean? = false
+        val isValid: Boolean = false,
+        val newStringField: String = "",
+        val newDoubleField: Double = 0.0
     )
 
     val moshi = Moshi.Builder().addLast(KotlinJsonAdapterFactory()).build()

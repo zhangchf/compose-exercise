@@ -15,5 +15,7 @@ data class Model1(
 data class Model2(
     val name: String,
     val age: Int,
-    val isValid: Boolean? = false
+    val isValid: Boolean? = false,
+    val newStringField: String = "",
+    val newDoubleField: Double = 0.0
 )

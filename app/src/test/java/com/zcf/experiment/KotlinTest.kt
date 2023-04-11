@@ -11,5 +11,16 @@ class KotlinTest {
         Assert.assertFalse("+86123456".startsWith("+$countryCode"))
     }
 
+    @Test
+    fun emptyStringSplit() {
+        val splitResult = "".split(",")
+        Assert.assertTrue(splitResult.isEmpty())
+    }
+
+    @Test
+    fun isLetter() {
+        Assert.assertTrue('.'.isLetter())
+    }
+
 
 }
