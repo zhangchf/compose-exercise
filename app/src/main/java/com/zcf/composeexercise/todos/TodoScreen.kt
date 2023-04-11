@@ -1,7 +1,6 @@
 package com.zcf.composeexercise.todos
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -33,7 +32,6 @@ val BOTTOM_NAV_ITEMS = listOf(
   TextFieldPage, SnackBarPage, CanvasPage
 )
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun TodosListView(
   navController: NavController,
@@ -87,12 +85,14 @@ fun TodosListView(
     },
     floatingActionButtonPosition = FabPosition.End,
     isFloatingActionButtonDocked = true
-  ) {
+  ) { paddingValues ->
 
     val errorMsg = viewModel.errorMsg.value
     if (errorMsg.isEmpty()) {
       LazyColumn(
-        modifier = Modifier.padding(horizontal = 16.dp)
+        modifier = Modifier
+          .padding(paddingValues)
+          .padding(horizontal = 16.dp)
       ) {
         items(viewModel.todos) {
           Column {
