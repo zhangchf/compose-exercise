@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.IntrinsicSize.Max
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.*
+import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,24 +32,60 @@ fun PriceAnalyticsView() {
     val pagerState = rememberPagerState()
     val coroutineScope = rememberCoroutineScope()
 
+    val tabScrollState = rememberScrollState()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(color = MaterialTheme.colors.background)
+            .background(color = colors.background)
     ) {
         val selectedTabIndex = pagerState.currentPage
-        ScrollableTabRow(
-            selectedTabIndex = selectedTabIndex,
+
+        // ScrollableTabRow(
+        //   selectedTabIndex = selectedTabIndex,
+        //   modifier = Modifier
+        //     .fillMaxWidth()
+        //     .padding(8.dp)
+        //     .align(Alignment.Start),
+        //   divider = {}
+        // ) {
+        //   tabs.forEachIndexed { page, tabName ->
+        //     Tab(
+        //       selected = page == selectedTabIndex,
+        //       onClick = {
+        //         coroutineScope.launch {
+        //           pagerState.scrollToPage(page)
+        //         }
+        //       }
+        //     ) {
+        //       Text(
+        //         text = tabName,
+        //         modifier = Modifier.padding(8.dp),
+        //         fontSize = 16.sp
+        //       )
+        //     }
+        //   }
+        // }
+
+
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(8.dp)
-                .align(Alignment.Start),
-            divider = {}
+                .padding(horizontal = 4.dp, vertical = 8.dp)
+                .align(Alignment.Start)
+                .horizontalScroll(tabScrollState)
         ) {
             tabs.forEachIndexed { page, tabName ->
-                Tab(
-                    selected = page == selectedTabIndex,
-                    onClick = {
+                val (bgColor, fgColor) = if (selectedTabIndex == page) {
+                    colors.primary to colors.onPrimary
+                } else {
+                    colors.secondary to colors.onSecondary
+                }
+
+                Box(
+                    modifier = Modifier.padding(horizontal = 4.dp)
+                        .background(bgColor)
+                        .clickable {
                         coroutineScope.launch {
                             pagerState.scrollToPage(page)
                         }
@@ -57,13 +94,12 @@ fun PriceAnalyticsView() {
                     Text(
                         text = tabName,
                         modifier = Modifier.padding(8.dp),
-                        fontSize = 16.sp
+                        fontSize = 16.sp,
+                        color = fgColor
                     )
                 }
             }
         }
-
-        val sizeInfoList = mockPdpSellState
 
         val backgroundColor = Color(0xFF121212)
         HorizontalPager(
@@ -72,6 +108,9 @@ fun PriceAnalyticsView() {
             state = pagerState,
             beyondBoundsPageCount = 1
         ) { page ->
+
+            val sizeInfoList = mockPdpSellState
+
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -149,7 +188,7 @@ fun PriceItemText(text: String?) = Box(
     Text(
         text = text ?: "",
         maxLines = 1,
-        color = MaterialTheme.colors.onSurface
+        color = colors.onSurface
     )
 }
 
@@ -164,7 +203,7 @@ fun PriceItemButton(text: String?) = Box(
         Button(
             onClick = { },
             colors = ButtonDefaults.buttonColors(
-                backgroundColor = MaterialTheme.colors.primary
+                backgroundColor = colors.primary
             )
         ) {
             Text(
