@@ -1,24 +1,23 @@
 package com.zcf.composeexercise.pages
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.DraggableState
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.detectDragGestures
-import androidx.compose.foundation.gestures.draggable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.gestures.*
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.interaction.collectIsDraggedAsState
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.dp
 import kotlin.math.roundToInt
 
 @Composable
@@ -29,13 +28,16 @@ fun GesturesPage() {
                 Text(text = "Gestures")
             }
         }
-    ) {
+    ) { paddingValues ->
         Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .padding(paddingValues)
+                .fillMaxSize()
         ) {
             DraggableInOneDirection()
             DraggableFreely()
 
+            ScrollableSample()
         }
 
     }
@@ -82,4 +84,31 @@ fun DraggableFreely() {
                 }
             }
     )
+}
+
+@Composable
+private fun ScrollableSample() {
+    // actual composable state
+    var offset by remember { mutableStateOf(0f) }
+
+    val scrollState = rememberScrollState()
+    scrollState.interactionSource.collectIsDraggedAsState()
+    Box(
+        Modifier
+            .size(150.dp)
+            .horizontalScroll(scrollState)
+            .scrollable(
+                orientation = Orientation.Vertical,
+                // Scrollable state: describes how to consume
+                // scrolling delta and update offset
+                state = rememberScrollableState { delta ->
+                    offset += delta
+                    delta
+                }
+            )
+            .background(Color.LightGray),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(offset.toString())
+    }
 }
