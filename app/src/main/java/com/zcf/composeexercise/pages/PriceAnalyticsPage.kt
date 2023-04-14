@@ -22,7 +22,6 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
-import androidx.compose.ui.layout.boundsInParent
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.tooling.preview.Preview
@@ -30,6 +29,7 @@ import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zcf.composeexercise.ui.theme.Colors
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 import kotlin.random.Random
@@ -60,83 +60,42 @@ fun PriceAnalyticsView() {
     ) {
         val selectedTabIndex = pagerState.currentPage
 
-         ScrollableTabRow(
-           selectedTabIndex = selectedTabIndex,
-           modifier = Modifier
-               .fillMaxWidth()
-               .padding(8.dp)
-               .align(Alignment.Start),
-           divider = {}
-         ) {
-           tabs.forEachIndexed { page, tabName ->
-             Tab(
-               selected = page == selectedTabIndex,
-               onClick = {
-                 coroutineScope.launch {
-                   pagerState.scrollToPage(page)
-                 }
-               }
-             ) {
-               Text(
-                 text = tabName,
-                 modifier = Modifier.padding(8.dp),
-                 fontSize = 16.sp
-               )
-             }
-           }
-         }
-
-
-        LazyRow(
+        ScrollableTabRow(
+            selectedTabIndex = selectedTabIndex,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 4.dp, vertical = 8.dp),
-            state = tabLazyListState
+                .padding(8.dp)
+                .align(Alignment.Start),
+            divider = {}
         ) {
-            items(
-                count = tabs.size,
-                key = {index -> tabs[index] }
-            ) { page ->
-                val tabName = tabs[page]
-                val (bgColor, fgColor) = if (selectedTabIndex == page) {
-                    Colors.gray3 to Colors.background
-                } else {
-                    Colors.darkGray to Colors.gray1Solid
-                }
-
-                val bgColorState by if (selectedTabIndex == page) {
-                    animateColorAsState(targetValue = Colors.gray3)
-                } else {
-                    animateColorAsState(targetValue = Colors.darkGray)
-                }
-
-                val fgColorState by if (selectedTabIndex == page) {
-                    animateColorAsState(targetValue = Colors.background)
-                } else {
-                    animateColorAsState(targetValue = Colors.gray1Solid)
-                }
-
-                Box(
-                    modifier = Modifier
-                        .padding(horizontal = 4.dp)
-                        .background(bgColorState)
-                        .clickable {
-                            coroutineScope.launch {
-                                pagerState.scrollToPage(page)
-                            }
+            tabs.forEachIndexed { page, tabName ->
+                Tab(
+                    selected = page == selectedTabIndex,
+                    onClick = {
+                        coroutineScope.launch {
+                            pagerState.scrollToPage(page)
                         }
+                    }
                 ) {
                     Text(
                         text = tabName,
                         modifier = Modifier.padding(8.dp),
-                        fontSize = 16.sp,
-                        color = fgColorState
+                        fontSize = 16.sp
                     )
                 }
             }
         }
 
-        AliasScrollableTab(
+        AliasScrollableTab_LazyRow(
+            tabs = tabs,
+            selectedTabIndex = selectedTabIndex
+        ) { page ->
+            coroutineScope.launch {
+                pagerState.scrollToPage(page)
+            }
+        }
+
+        AliasScrollableTab_CustomizeRow(
             tabs = tabs,
             selectedTabIndex = selectedTabIndex
         ) { page ->
@@ -258,59 +217,57 @@ fun PriceItemButton(text: String?) = Box(
 @Composable
 fun PriceItemDivider() = Divider(color = Color.DarkGray)
 
+fun Modifier.handleNestedHorizontalScroll(
+    scrollState: ScrollState,
+    coroutineScope: CoroutineScope
+): Modifier {
+    return this.pointerInput(Unit) {
+        awaitEachGesture {
+            val down = awaitFirstDown(requireUnconsumed = false)
+            val canScrollBackward = scrollState.canScrollBackward
+            val canScrollForward = scrollState.canScrollForward
+            println("zcf1 onDragStarted, canScrollBackward: $canScrollBackward, canScrollForward: $canScrollForward")
+
+            fun onHorizontalDrag(delta: Float) {
+                coroutineScope.launch {
+                    scrollState.scrollBy(-delta)
+                }
+            }
+
+            var overSlop = 0f
+            val drag = awaitHorizontalTouchSlopOrCancellation(down.id) { change, over ->
+                val consume = when {
+                    canScrollBackward && over > 0 -> true
+                    canScrollForward && over < 0 -> true
+                    else -> false
+                }
+                if (consume) {
+                    change.consume()
+                    overSlop = over
+                }
+            }
+            if (drag != null) {
+                onHorizontalDrag(overSlop)
+                horizontalDrag(drag.id) {
+                    onHorizontalDrag(it.positionChange().x)
+                    it.consume()
+                }
+            }
+        }
+    }
+}
+
 @Composable
 fun NestedScrollablePriceView(sizeInfoList: List<PdpSellSizeInfo>) {
-    val childScrollState = rememberScrollState()
-
-    var canScrollBackward by remember { mutableStateOf(false) }
-    var canScrollForward by remember { mutableStateOf(false) }
+    val scrollState = rememberScrollState()
 
     val coroutineScope = rememberCoroutineScope()
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .horizontalScroll(childScrollState)
-            .pointerInput(Unit) {
-                awaitEachGesture {
-                    val down = awaitFirstDown(requireUnconsumed = false)
-                    canScrollBackward = childScrollState.canScrollBackward
-                    canScrollForward = childScrollState.canScrollForward
-                    println("zcf1 onDragStarted, canScrollBackward: $canScrollBackward, canScrollForward: $canScrollForward")
-
-                    fun onHorizontalDrag(delta: Float) {
-//                        println("zcf1 onHorizontalDrag, delta: $delta")
-                        coroutineScope.launch {
-                            childScrollState.scrollBy(-delta)
-                        }
-                    }
-
-                    var overSlop = 0f
-                    val drag = awaitHorizontalTouchSlopOrCancellation(down.id) { change, over ->
-                        val consume = when {
-                            canScrollBackward && over > 0 -> true
-                            canScrollForward && over < 0 -> true
-                            else -> false
-                        }
-                        if (consume) {
-                            change.consume()
-                            overSlop = over
-                        }
-                    }
-                    if (drag != null) {
-//                        println("zcf1 onDrag 1")
-                        onHorizontalDrag(overSlop)
-                        if (
-                            horizontalDrag(drag.id) {
-//                                println("zcf1 onDrag 2")
-                                onHorizontalDrag(it.positionChange().x)
-                                it.consume()
-                            }
-                        ) {
-                        }
-                    }
-                }
-            }
+            .horizontalScroll(scrollState)
+            .handleNestedHorizontalScroll(scrollState, coroutineScope)
     ) {
         Column(
             modifier = Modifier.width(Max)
@@ -460,7 +417,7 @@ fun NestedScrollablePriceView_nestedScroll(sizeInfoList: List<PdpSellSizeInfo>) 
 }
 
 @Composable
-fun AliasScrollableTab(
+fun AliasScrollableTab_CustomizeRow(
     tabs: List<String>,
     selectedTabIndex: Int,
     onTabSelected: (Int) -> Unit
@@ -519,6 +476,61 @@ fun AliasScrollableTab(
     }
 }
 
+@Composable
+fun AliasScrollableTab_LazyRow(
+    tabs: List<String>,
+    selectedTabIndex: Int,
+    onTabSelected: (Int) -> Unit
+) {
+    val scrollState = rememberLazyListState()
+
+    LaunchedEffect(key1 = selectedTabIndex) {
+        scrollState.animateScrollToItem(selectedTabIndex)
+    }
+
+    LazyRow(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 4.dp, vertical = 8.dp),
+        state = scrollState
+    ) {
+        items(
+            count = tabs.size,
+            key = { index -> tabs[index] }
+        ) { page ->
+            val tabName = tabs[page]
+
+            val bgColorState by if (selectedTabIndex == page) {
+                animateColorAsState(targetValue = Colors.gray3)
+            } else {
+                animateColorAsState(targetValue = Colors.darkGray)
+            }
+
+            val fgColorState by if (selectedTabIndex == page) {
+                animateColorAsState(targetValue = Colors.background)
+            } else {
+                animateColorAsState(targetValue = Colors.gray1Solid)
+            }
+
+            Box(
+                modifier = Modifier
+                    .padding(horizontal = 4.dp)
+                    .background(bgColorState)
+                    .clickable {
+                        onTabSelected(page)
+                    }
+            ) {
+                Text(
+                    text = tabName,
+                    modifier = Modifier.padding(8.dp),
+                    fontSize = 16.sp,
+                    color = fgColorState
+                )
+            }
+        }
+    }
+
+}
 
 
 data class PdpSellSizeInfo(
