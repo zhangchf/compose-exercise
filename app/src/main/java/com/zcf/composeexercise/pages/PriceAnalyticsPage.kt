@@ -1,5 +1,6 @@
 package com.zcf.composeexercise.pages
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.*
 import androidx.compose.foundation.layout.*
@@ -21,28 +22,35 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
+import androidx.compose.ui.layout.boundsInParent
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zcf.composeexercise.ui.theme.Colors
 import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 import kotlin.random.Random
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun PriceAnalyticsView() {
 
-    val tabs = listOf<String>("New New New", "New With Defects", "Used Used Used")
+    val tabs = listOf<String>("New New New New", "New With Defects", "Used Used Used Used")
 
     val pagerState = rememberPagerState()
     val tabLazyListState = rememberLazyListState()
+    val tabRowState = rememberScrollState()
 
     val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(pagerState.currentPage) {
         println("zcf1 launchedEffect")
         tabLazyListState.animateScrollToItem(pagerState.currentPage)
+
+        println("zcf1, tabRowState, value: ${tabRowState.value}, maxValue: ${tabRowState.maxValue}")
     }
 
     Column(
@@ -85,7 +93,10 @@ fun PriceAnalyticsView() {
                 .padding(horizontal = 4.dp, vertical = 8.dp),
             state = tabLazyListState
         ) {
-            items(tabs.size) { page ->
+            items(
+                count = tabs.size,
+                key = {index -> tabs[index] }
+            ) { page ->
                 val tabName = tabs[page]
                 val (bgColor, fgColor) = if (selectedTabIndex == page) {
                     Colors.gray3 to Colors.background
@@ -93,10 +104,22 @@ fun PriceAnalyticsView() {
                     Colors.darkGray to Colors.gray1Solid
                 }
 
+                val bgColorState by if (selectedTabIndex == page) {
+                    animateColorAsState(targetValue = Colors.gray3)
+                } else {
+                    animateColorAsState(targetValue = Colors.darkGray)
+                }
+
+                val fgColorState by if (selectedTabIndex == page) {
+                    animateColorAsState(targetValue = Colors.background)
+                } else {
+                    animateColorAsState(targetValue = Colors.gray1Solid)
+                }
+
                 Box(
                     modifier = Modifier
                         .padding(horizontal = 4.dp)
-                        .background(bgColor)
+                        .background(bgColorState)
                         .clickable {
                             coroutineScope.launch {
                                 pagerState.scrollToPage(page)
@@ -107,9 +130,18 @@ fun PriceAnalyticsView() {
                         text = tabName,
                         modifier = Modifier.padding(8.dp),
                         fontSize = 16.sp,
-                        color = fgColor
+                        color = fgColorState
                     )
                 }
+            }
+        }
+
+        AliasScrollableTab(
+            tabs = tabs,
+            selectedTabIndex = selectedTabIndex
+        ) { page ->
+            coroutineScope.launch {
+                pagerState.scrollToPage(page)
             }
         }
 
@@ -226,7 +258,6 @@ fun PriceItemButton(text: String?) = Box(
 @Composable
 fun PriceItemDivider() = Divider(color = Color.DarkGray)
 
-
 @Composable
 fun NestedScrollablePriceView(sizeInfoList: List<PdpSellSizeInfo>) {
     val childScrollState = rememberScrollState()
@@ -248,7 +279,7 @@ fun NestedScrollablePriceView(sizeInfoList: List<PdpSellSizeInfo>) {
                     println("zcf1 onDragStarted, canScrollBackward: $canScrollBackward, canScrollForward: $canScrollForward")
 
                     fun onHorizontalDrag(delta: Float) {
-                        println("zcf1 onHorizontalDrag, delta: $delta")
+//                        println("zcf1 onHorizontalDrag, delta: $delta")
                         coroutineScope.launch {
                             childScrollState.scrollBy(-delta)
                         }
@@ -267,16 +298,15 @@ fun NestedScrollablePriceView(sizeInfoList: List<PdpSellSizeInfo>) {
                         }
                     }
                     if (drag != null) {
-                        println("zcf1 onDrag 1")
+//                        println("zcf1 onDrag 1")
                         onHorizontalDrag(overSlop)
                         if (
                             horizontalDrag(drag.id) {
-                                println("zcf1 onDrag 2")
+//                                println("zcf1 onDrag 2")
                                 onHorizontalDrag(it.positionChange().x)
                                 it.consume()
                             }
                         ) {
-
                         }
                     }
                 }
@@ -424,6 +454,66 @@ fun NestedScrollablePriceView_nestedScroll(sizeInfoList: List<PdpSellSizeInfo>) 
                     PriceItemText(text = it.lowestPrice ?: randomText())
                 }
                 PriceItemDivider()
+            }
+        }
+    }
+}
+
+@Composable
+fun AliasScrollableTab(
+    tabs: List<String>,
+    selectedTabIndex: Int,
+    onTabSelected: (Int) -> Unit
+) {
+    val scrollState = rememberScrollState()
+
+    val tabPositions = mutableMapOf<Int, Float>()
+
+    LaunchedEffect(key1 = selectedTabIndex) {
+        tabPositions[selectedTabIndex]?.let {
+            println("zcf1 scroll to tab: $selectedTabIndex, $it")
+            scrollState.animateScrollTo(it.roundToInt())
+        }
+    }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .horizontalScroll(scrollState)
+            .padding(horizontal = 4.dp, vertical = 8.dp)
+    ) {
+        tabs.forEachIndexed { page, tabName ->
+
+            val bgColorState by if (selectedTabIndex == page) {
+                animateColorAsState(targetValue = Colors.gray3)
+            } else {
+                animateColorAsState(targetValue = Colors.darkGray)
+            }
+
+            val fgColorState by if (selectedTabIndex == page) {
+                animateColorAsState(targetValue = Colors.background)
+            } else {
+                animateColorAsState(targetValue = Colors.gray1Solid)
+            }
+
+            Box(
+                modifier = Modifier
+                    .onGloballyPositioned {
+                        tabPositions[page] = it.positionInParent().x
+                        println("zcf1 tabPositions: $page, ${tabPositions[page]}")
+                    }
+                    .padding(horizontal = 4.dp)
+                    .background(bgColorState)
+                    .clickable {
+                        onTabSelected(page)
+                    }
+            ) {
+                Text(
+                    text = tabName,
+                    modifier = Modifier.padding(8.dp),
+                    fontSize = 16.sp,
+                    color = fgColorState
+                )
             }
         }
     }
