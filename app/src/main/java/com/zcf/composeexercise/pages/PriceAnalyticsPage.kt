@@ -4,22 +4,20 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.IntrinsicSize.Max
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.*
-import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.LinearGradientShader
-import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.zcf.composeexercise.ui.theme.Colors
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
@@ -27,69 +25,75 @@ import kotlin.random.Random
 @Composable
 fun PriceAnalyticsView() {
 
-    val tabs = listOf<String>("New", "New With Defects", "Used")
+    val tabs = listOf<String>("New New New", "New With Defects", "Used Used Used")
 
     val pagerState = rememberPagerState()
+    val tabLazyListState = rememberLazyListState()
+
     val coroutineScope = rememberCoroutineScope()
 
-    val tabScrollState = rememberScrollState()
+    LaunchedEffect(pagerState.currentPage) {
+        println("zcf1 launchedEffect")
+        tabLazyListState.animateScrollToItem(pagerState.currentPage)
+    }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(color = colors.background)
+            .background(color = Colors.background)
     ) {
         val selectedTabIndex = pagerState.currentPage
 
-        // ScrollableTabRow(
-        //   selectedTabIndex = selectedTabIndex,
-        //   modifier = Modifier
-        //     .fillMaxWidth()
-        //     .padding(8.dp)
-        //     .align(Alignment.Start),
-        //   divider = {}
-        // ) {
-        //   tabs.forEachIndexed { page, tabName ->
-        //     Tab(
-        //       selected = page == selectedTabIndex,
-        //       onClick = {
-        //         coroutineScope.launch {
-        //           pagerState.scrollToPage(page)
-        //         }
-        //       }
-        //     ) {
-        //       Text(
-        //         text = tabName,
-        //         modifier = Modifier.padding(8.dp),
-        //         fontSize = 16.sp
-        //       )
-        //     }
-        //   }
-        // }
+         ScrollableTabRow(
+           selectedTabIndex = selectedTabIndex,
+           modifier = Modifier
+             .fillMaxWidth()
+             .padding(8.dp)
+             .align(Alignment.Start),
+           divider = {}
+         ) {
+           tabs.forEachIndexed { page, tabName ->
+             Tab(
+               selected = page == selectedTabIndex,
+               onClick = {
+                 coroutineScope.launch {
+                   pagerState.scrollToPage(page)
+                 }
+               }
+             ) {
+               Text(
+                 text = tabName,
+                 modifier = Modifier.padding(8.dp),
+                 fontSize = 16.sp
+               )
+             }
+           }
+         }
 
 
-        Row(
+        LazyRow(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 4.dp, vertical = 8.dp)
-                .align(Alignment.Start)
-                .horizontalScroll(tabScrollState)
+                .padding(horizontal = 4.dp, vertical = 8.dp),
+            state = tabLazyListState
         ) {
-            tabs.forEachIndexed { page, tabName ->
+            items(tabs.size) { page ->
+                val tabName = tabs[page]
                 val (bgColor, fgColor) = if (selectedTabIndex == page) {
-                    colors.primary to colors.onPrimary
+                    Colors.gray3 to Colors.background
                 } else {
-                    colors.secondary to colors.onSecondary
+                    Colors.darkGray to Colors.gray1Solid
                 }
 
                 Box(
-                    modifier = Modifier.padding(horizontal = 4.dp)
+                    modifier = Modifier
+                        .padding(horizontal = 4.dp)
                         .background(bgColor)
                         .clickable {
-                        coroutineScope.launch {
-                            pagerState.scrollToPage(page)
+                            coroutineScope.launch {
+                                pagerState.scrollToPage(page)
+                            }
                         }
-                    }
                 ) {
                     Text(
                         text = tabName,
@@ -101,7 +105,6 @@ fun PriceAnalyticsView() {
             }
         }
 
-        val backgroundColor = Color(0xFF121212)
         HorizontalPager(
             pageCount = 3,
             modifier = Modifier.fillMaxSize(),
@@ -122,7 +125,6 @@ fun PriceAnalyticsView() {
                     Column(
                         modifier = Modifier
                             .width(Max)
-//                            .background(color = backgroundColor)
                     ) {
                         PriceItemDivider()
                         PriceHeaderText(text = "US M")
@@ -135,16 +137,16 @@ fun PriceAnalyticsView() {
                     Column(
                         modifier = Modifier
                             .weight(1f)
-//                            .background(
-//                                brush = Brush.horizontalGradient(
-//                                    colorStops = arrayOf(
-//                                        Pair(0f, Color.Black),
-//                                        Pair(0.1f, backgroundColor),
-//                                        Pair(0.9f, backgroundColor),
-//                                        Pair(1.0f, Color.Black)
-//                                    )
-//                                )
-//                            )
+                            .background(
+                                brush = Brush.horizontalGradient(
+                                    colorStops = arrayOf(
+                                        Pair(0f, Color.Black),
+                                        Pair(0.1f, Colors.windowBackground),
+                                        Pair(0.9f, Colors.windowBackground),
+                                        Pair(1.0f, Color.Black)
+                                    )
+                                )
+                            )
                     ) {
 
                         NestedScrollablePriceView(sizeInfoList = sizeInfoList)
@@ -153,7 +155,6 @@ fun PriceAnalyticsView() {
                     Column(
                         modifier = Modifier
                             .width(100.dp)
-//                            .background(color = backgroundColor)
                     ) {
                         PriceItemDivider()
                         PriceHeaderText(text = "TOP OFFER")
@@ -188,7 +189,7 @@ fun PriceItemText(text: String?) = Box(
     Text(
         text = text ?: "",
         maxLines = 1,
-        color = colors.onSurface
+        color = Colors.gray3
     )
 }
 
@@ -203,7 +204,7 @@ fun PriceItemButton(text: String?) = Box(
         Button(
             onClick = { },
             colors = ButtonDefaults.buttonColors(
-                backgroundColor = colors.primary
+                backgroundColor = Colors.positive
             )
         ) {
             Text(
