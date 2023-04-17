@@ -30,8 +30,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zcf.composeexercise.ui.theme.Colors
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
+import kotlin.math.sign
 import kotlin.random.Random
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -107,8 +109,7 @@ fun PriceAnalyticsView() {
         HorizontalPager(
             pageCount = 3,
             modifier = Modifier.fillMaxSize(),
-            state = pagerState,
-            beyondBoundsPageCount = 1
+            state = pagerState
         ) { page ->
 
             val sizeInfoList = mockPdpSellState
@@ -217,8 +218,10 @@ fun PriceItemButton(text: String?) = Box(
 @Composable
 fun PriceItemDivider() = Divider(color = Color.DarkGray)
 
+@OptIn(ExperimentalFoundationApi::class)
 fun Modifier.handleNestedHorizontalScroll(
     scrollState: ScrollState,
+    overscrollEffect: OverscrollEffect,
     coroutineScope: CoroutineScope
 ): Modifier {
     return this.pointerInput(Unit) {
@@ -229,14 +232,32 @@ fun Modifier.handleNestedHorizontalScroll(
             println("zcf1 onDragStarted, canScrollBackward: $canScrollBackward, canScrollForward: $canScrollForward")
 
             fun onHorizontalDrag(delta: Float) {
+                overscrollEffect.applyToScroll(Offset(delta, 0f), NestedScrollSource.Drag) {
+                    val consumed = when {
+                        canScrollBackward && delta > 0 -> scrollState.value.coerceAtMost(delta.roundToInt())
+                        canScrollForward && delta < 0 -> (scrollState.value - scrollState.maxValue).coerceAtLeast(delta.roundToInt())
+                        else -> 0
+                    }.toFloat()
+                    println("zcf1 onHorizontalDrag, delta: $delta, consumed: $consumed")
+                    coroutineScope.launch {
+                        scrollState.scrollBy(-consumed)
+                    }
+                    Offset(consumed, 0f)
+                }
+            }
+
+            fun onHorizontalDragEnd(velocity: Velocity) {
                 coroutineScope.launch {
-                    scrollState.scrollBy(-delta)
+                    overscrollEffect.applyToFling(velocity) {
+                        Velocity.Zero
+                    }
                 }
             }
 
             var overSlop = 0f
             val drag = awaitHorizontalTouchSlopOrCancellation(down.id) { change, over ->
                 val consume = when {
+                    overscrollEffect.isInProgress -> true
                     canScrollBackward && over > 0 -> true
                     canScrollForward && over < 0 -> true
                     else -> false
@@ -248,26 +269,32 @@ fun Modifier.handleNestedHorizontalScroll(
             }
             if (drag != null) {
                 onHorizontalDrag(overSlop)
-                horizontalDrag(drag.id) {
+                if (horizontalDrag(drag.id) {
                     onHorizontalDrag(it.positionChange().x)
                     it.consume()
+                }) {
+                    onHorizontalDragEnd(Velocity(10f * overSlop.sign, 0f))
                 }
             }
         }
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun NestedScrollablePriceView(sizeInfoList: List<PdpSellSizeInfo>) {
     val scrollState = rememberScrollState()
 
     val coroutineScope = rememberCoroutineScope()
 
+    val overscrollEffect = ScrollableDefaults.overscrollEffect()
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .overscroll(overscrollEffect)
             .horizontalScroll(scrollState)
-            .handleNestedHorizontalScroll(scrollState, coroutineScope)
+            .handleNestedHorizontalScroll(scrollState, overscrollEffect, coroutineScope)
     ) {
         Column(
             modifier = Modifier.width(Max)
