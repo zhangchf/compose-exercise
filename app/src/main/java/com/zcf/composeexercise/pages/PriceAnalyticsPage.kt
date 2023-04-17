@@ -170,53 +170,46 @@ fun PriceAnalyticsView() {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun PriceHeaderText(text: String?) = Text(
-    text = text ?: "",
-    modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-    fontSize = 12.sp,
-    maxLines = 1
-)
+fun NestedScrollablePriceView(sizeInfoList: List<PdpSellSizeInfo>) {
+    val scrollState = rememberScrollState()
 
-@Composable
-fun PriceItemText(text: String?) = Box(
-    modifier = Modifier
-        .height(80.dp)
-        .fillMaxWidth()
-        .padding(horizontal = 12.dp),
-    contentAlignment = Alignment.CenterStart
-) {
-    Text(
-        text = text ?: "",
-        maxLines = 1,
-        color = Colors.gray3
-    )
-}
+    val coroutineScope = rememberCoroutineScope()
 
-@Composable
-fun PriceItemButton(text: String?) = Box(
-    modifier = Modifier
-        .height(80.dp)
-        .fillMaxWidth(),
-    contentAlignment = Alignment.Center
-) {
-    if (text?.isNotBlank() == true) {
-        Button(
-            onClick = { },
-            colors = ButtonDefaults.buttonColors(
-                backgroundColor = Colors.positive
-            )
+    val overscrollEffect = ScrollableDefaults.overscrollEffect()
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .overscroll(overscrollEffect)
+            .horizontalScroll(scrollState)
+            .handleNestedHorizontalScroll(scrollState, overscrollEffect, coroutineScope)
+    ) {
+        Column(
+            modifier = Modifier.width(Max)
         ) {
-            Text(
-                text = text ?: "",
-                maxLines = 1
-            )
+            PriceItemDivider()
+            PriceHeaderText(text = "LAST")
+            sizeInfoList.forEach {
+                PriceItemDivider()
+                PriceItemText(text = it.lastSoldPrice ?: randomText())
+            }
+            PriceItemDivider()
+        }
+        Column(
+            modifier = Modifier.width(Max)
+        ) {
+            PriceItemDivider()
+            PriceHeaderText(text = "LOWEST")
+            sizeInfoList.forEach {
+                PriceItemDivider()
+                PriceItemText(text = it.lowestPrice ?: randomText())
+            }
+            PriceItemDivider()
         }
     }
 }
-
-@Composable
-fun PriceItemDivider() = Divider(color = Color.DarkGray)
 
 @OptIn(ExperimentalFoundationApi::class)
 fun Modifier.handleNestedHorizontalScroll(
@@ -273,50 +266,11 @@ fun Modifier.handleNestedHorizontalScroll(
                     onHorizontalDrag(it.positionChange().x)
                     it.consume()
                 }) {
+                    // As we can't determine the end velocity here,
+                    // we just use a number which is adjusted to have a good UI effect
                     onHorizontalDragEnd(Velocity(10f * overSlop.sign, 0f))
                 }
             }
-        }
-    }
-}
-
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-fun NestedScrollablePriceView(sizeInfoList: List<PdpSellSizeInfo>) {
-    val scrollState = rememberScrollState()
-
-    val coroutineScope = rememberCoroutineScope()
-
-    val overscrollEffect = ScrollableDefaults.overscrollEffect()
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .overscroll(overscrollEffect)
-            .horizontalScroll(scrollState)
-            .handleNestedHorizontalScroll(scrollState, overscrollEffect, coroutineScope)
-    ) {
-        Column(
-            modifier = Modifier.width(Max)
-        ) {
-            PriceItemDivider()
-            PriceHeaderText(text = "LAST")
-            sizeInfoList.forEach {
-                PriceItemDivider()
-                PriceItemText(text = it.lastSoldPrice ?: randomText())
-            }
-            PriceItemDivider()
-        }
-        Column(
-            modifier = Modifier.width(Max)
-        ) {
-            PriceItemDivider()
-            PriceHeaderText(text = "LOWEST")
-            sizeInfoList.forEach {
-                PriceItemDivider()
-                PriceItemText(text = it.lowestPrice ?: randomText())
-            }
-            PriceItemDivider()
         }
     }
 }
@@ -559,6 +513,53 @@ fun AliasScrollableTab_LazyRow(
 
 }
 
+@Composable
+fun PriceHeaderText(text: String?) = Text(
+    text = text ?: "",
+    modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+    fontSize = 12.sp,
+    maxLines = 1
+)
+
+@Composable
+fun PriceItemText(text: String?) = Box(
+    modifier = Modifier
+        .height(80.dp)
+        .fillMaxWidth()
+        .padding(horizontal = 12.dp),
+    contentAlignment = Alignment.CenterStart
+) {
+    Text(
+        text = text ?: "",
+        maxLines = 1,
+        color = Colors.gray3
+    )
+}
+
+@Composable
+fun PriceItemButton(text: String?) = Box(
+    modifier = Modifier
+        .height(80.dp)
+        .fillMaxWidth(),
+    contentAlignment = Alignment.Center
+) {
+    if (text?.isNotBlank() == true) {
+        Button(
+            onClick = { },
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = Colors.positive
+            )
+        ) {
+            Text(
+                text = text ?: "",
+                maxLines = 1
+            )
+        }
+    }
+}
+
+@Composable
+fun PriceItemDivider() = Divider(color = Color.DarkGray)
 
 data class PdpSellSizeInfo(
     val size: String,
