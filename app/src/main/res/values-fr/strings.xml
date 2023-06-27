@@ -1,4 +1,9 @@
 <resources>
   <string name="app_name">appName in French</string>
   <string name="mainScreenTitle">Main Screen in French</string>
+  <plurals name="ordersCounter">
+    <item quantity="one">%d Order fr</item>
+    <item quantity="many" />
+    <item quantity="other">%d Orders fr</item>
+  </plurals>
 </resources>

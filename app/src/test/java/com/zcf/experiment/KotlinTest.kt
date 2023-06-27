@@ -22,5 +22,20 @@ class KotlinTest {
         Assert.assertTrue('.'.isLetter())
     }
 
+    @Test
+    fun whenStatement() {
+        var x = 4
+        var y = 3
+        when {
+            x == 5 -> println("zcf 5")
+            y == 6 -> println("zcf 6")
+        }
+        var z = when {
+            x == 5 -> println("zcf 5")
+            y == 6 -> println("zcf 6")
+            else -> {}
+        }
+    }
+
 
 }

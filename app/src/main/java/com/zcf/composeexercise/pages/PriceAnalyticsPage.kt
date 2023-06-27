@@ -182,7 +182,6 @@ fun NestedScrollablePriceView(sizeInfoList: List<PdpSellSizeInfo>) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .overscroll(overscrollEffect)
             .horizontalScroll(scrollState)
             .handleNestedHorizontalScroll(scrollState, overscrollEffect, coroutineScope)
     ) {
@@ -217,62 +216,66 @@ fun Modifier.handleNestedHorizontalScroll(
     overscrollEffect: OverscrollEffect,
     coroutineScope: CoroutineScope
 ): Modifier {
-    return this.pointerInput(Unit) {
-        awaitEachGesture {
-            val down = awaitFirstDown(requireUnconsumed = false)
-            val canScrollBackward = scrollState.canScrollBackward
-            val canScrollForward = scrollState.canScrollForward
-            println("zcf1 onDragStarted, canScrollBackward: $canScrollBackward, canScrollForward: $canScrollForward")
+    return this
+        .overscroll(overscrollEffect)
+        .pointerInput(Unit) {
+            awaitEachGesture {
+                val down = awaitFirstDown(requireUnconsumed = false)
+                val canScrollBackward = scrollState.canScrollBackward
+                val canScrollForward = scrollState.canScrollForward
+                println("zcf1 onDragStarted, canScrollBackward: $canScrollBackward, canScrollForward: $canScrollForward")
 
-            fun onHorizontalDrag(delta: Float) {
-                overscrollEffect.applyToScroll(Offset(delta, 0f), NestedScrollSource.Drag) {
-                    val consumed = when {
-                        canScrollBackward && delta > 0 -> scrollState.value.coerceAtMost(delta.roundToInt())
-                        canScrollForward && delta < 0 -> (scrollState.value - scrollState.maxValue).coerceAtLeast(delta.roundToInt())
-                        else -> 0
-                    }.toFloat()
-                    println("zcf1 onHorizontalDrag, delta: $delta, consumed: $consumed")
+                fun onHorizontalDrag(delta: Float) {
+                    overscrollEffect.applyToScroll(Offset(delta, 0f), NestedScrollSource.Drag) {
+                        val consumed = when {
+                            canScrollBackward && delta > 0 -> scrollState.value.coerceAtMost(delta.roundToInt())
+                            canScrollForward && delta < 0 -> (scrollState.value - scrollState.maxValue).coerceAtLeast(
+                                delta.roundToInt()
+                            )
+                            else -> 0
+                        }.toFloat()
+                        println("zcf1 onHorizontalDrag, delta: $delta, consumed: $consumed")
+                        coroutineScope.launch {
+                            scrollState.scrollBy(-consumed)
+                        }
+                        Offset(consumed, 0f)
+                    }
+                }
+
+                fun onHorizontalDragEnd(velocity: Velocity) {
                     coroutineScope.launch {
-                        scrollState.scrollBy(-consumed)
-                    }
-                    Offset(consumed, 0f)
-                }
-            }
-
-            fun onHorizontalDragEnd(velocity: Velocity) {
-                coroutineScope.launch {
-                    overscrollEffect.applyToFling(velocity) {
-                        Velocity.Zero
+                        overscrollEffect.applyToFling(velocity) {
+                            Velocity.Zero
+                        }
                     }
                 }
-            }
 
-            var overSlop = 0f
-            val drag = awaitHorizontalTouchSlopOrCancellation(down.id) { change, over ->
-                val consume = when {
-                    overscrollEffect.isInProgress -> true
-                    canScrollBackward && over > 0 -> true
-                    canScrollForward && over < 0 -> true
-                    else -> false
+                var overSlop = 0f
+                val drag = awaitHorizontalTouchSlopOrCancellation(down.id) { change, over ->
+                    val consume = when {
+                        overscrollEffect.isInProgress -> true
+                        canScrollBackward && over > 0 -> true
+                        canScrollForward && over < 0 -> true
+                        else -> false
+                    }
+                    if (consume) {
+                        change.consume()
+                        overSlop = over
+                    }
                 }
-                if (consume) {
-                    change.consume()
-                    overSlop = over
-                }
-            }
-            if (drag != null) {
-                onHorizontalDrag(overSlop)
-                if (horizontalDrag(drag.id) {
-                    onHorizontalDrag(it.positionChange().x)
-                    it.consume()
-                }) {
-                    // As we can't determine the end velocity here,
-                    // we just use a number which is adjusted to have a good UI effect
-                    onHorizontalDragEnd(Velocity(10f * overSlop.sign, 0f))
+                if (drag != null) {
+                    onHorizontalDrag(overSlop)
+                    if (horizontalDrag(drag.id) {
+                            onHorizontalDrag(it.positionChange().x)
+                            it.consume()
+                        }) {
+                        // As we can't determine the end velocity here,
+                        // we just use a number which is adjusted to have a good UI effect
+                        onHorizontalDragEnd(Velocity(10f * overSlop.sign, 0f))
+                    }
                 }
             }
         }
-    }
 }
 
 @Composable
