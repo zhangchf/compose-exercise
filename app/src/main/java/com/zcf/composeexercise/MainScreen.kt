@@ -57,7 +57,8 @@ enum class MainScreenRoutes(val key: String, val displayName: String) {
     BackdropScaffold("backdropScaffold", "BackdropScaffold"),
     MirrorPage("mirrorPage", "Mirror Effect"),
     ParallaxPage("parallaxPage", "Parallax"),
-    PriceAnalyticsPage("priceAnalyticsPage", "Price Analytics Page")
+    PriceAnalyticsPage("priceAnalyticsPage", "Price Analytics Page"),
+    TextToolbarPage("textToolbarPage", "Text Toolbar")
 }
 
 fun NavGraphBuilder.mainScreenNavGraph(navController: NavController) {
@@ -114,6 +115,9 @@ fun NavGraphBuilder.mainScreenNavGraph(navController: NavController) {
         }
         composable(MainScreenRoutes.PriceAnalyticsPage.key) {
             PriceAnalyticsView()
+        }
+        composable(MainScreenRoutes.TextToolbarPage.key) {
+            TextToolbarPage()
         }
     }
 }
