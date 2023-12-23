@@ -42,7 +42,7 @@ fun PriceAnalyticsView() {
 
     val tabs = listOf<String>("New New New New", "New With Defects", "Used Used Used Used")
 
-    val pagerState = rememberPagerState()
+    val pagerState = rememberPagerState { tabs.size }
     val tabLazyListState = rememberLazyListState()
     val tabRowState = rememberScrollState()
 
@@ -107,7 +107,6 @@ fun PriceAnalyticsView() {
         }
 
         HorizontalPager(
-            pageCount = 3,
             modifier = Modifier.fillMaxSize(),
             state = pagerState
         ) { page ->
