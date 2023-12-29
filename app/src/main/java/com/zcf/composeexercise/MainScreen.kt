@@ -31,7 +31,9 @@ fun MainScreen(navController: NavController) {
         }
     ) { paddingValues ->
         LazyColumn(
-            modifier = Modifier.padding(paddingValues).fillMaxSize(),
+            modifier = Modifier
+                .padding(paddingValues)
+                .fillMaxSize(),
             verticalArrangement = Arrangement.SpaceEvenly,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -58,7 +60,8 @@ enum class MainScreenRoutes(val key: String, val displayName: String) {
     MirrorPage("mirrorPage", "Mirror Effect"),
     ParallaxPage("parallaxPage", "Parallax"),
     PriceAnalyticsPage("priceAnalyticsPage", "Price Analytics Page"),
-    TextToolbarPage("textToolbarPage", "Text Toolbar")
+    TextToolbarPage("textToolbarPage", "Text Toolbar"),
+    AnimatedTransitionDialog("animatedTransitionDialog", "Animated Transition Dialog")
 }
 
 fun NavGraphBuilder.mainScreenNavGraph(navController: NavController) {
@@ -118,6 +121,9 @@ fun NavGraphBuilder.mainScreenNavGraph(navController: NavController) {
         }
         composable(MainScreenRoutes.TextToolbarPage.key) {
             TextToolbarPage()
+        }
+        composable(MainScreenRoutes.AnimatedTransitionDialog.key) {
+            AnimatedBottomSheetDialogPage()
         }
     }
 }
