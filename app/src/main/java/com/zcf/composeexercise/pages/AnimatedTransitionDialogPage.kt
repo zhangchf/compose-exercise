@@ -6,6 +6,7 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material.Button
 import androidx.compose.material.SnackbarHost
@@ -17,6 +18,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
@@ -30,6 +32,7 @@ fun AnimatedBottomSheetDialogPage() {
     var showAnimatedTransitionDialogWithCallback by remember { mutableStateOf(false) }
     var showCustomAnimationDialog by remember { mutableStateOf(false) }
     var showCustomAnimationDialog_BottomSheet by remember { mutableStateOf(false) }
+    var showCustomAnimationDialog_Draggable by remember { mutableStateOf(false) }
 
     Column(modifier = Modifier.fillMaxSize()) {
         Button(onClick = {
@@ -54,6 +57,12 @@ fun AnimatedBottomSheetDialogPage() {
             showCustomAnimationDialog_BottomSheet = true
         }) {
             Text(text = "Custom animation dialog (Simplified bottom sheet)")
+        }
+
+        Button(onClick = {
+            showCustomAnimationDialog_Draggable = true
+        }) {
+            Text(text = "Custom animation dialog (Draggable)")
         }
 
         Spacer(modifier = Modifier.weight(1f))
@@ -144,6 +153,22 @@ fun AnimatedBottomSheetDialogPage() {
             }
         )
     }
+
+    CustomAnimationDialog_Draggable(
+        showDialog = showCustomAnimationDialog_Draggable,
+        onDismissRequest = { showCustomAnimationDialog_Draggable = false },
+    ) {
+        DialogContent(
+            onPositiveButton = {
+                showCustomAnimationDialog_Draggable = false
+                onPositiveButton()
+            },
+            onNegativeButton = {
+                showCustomAnimationDialog_Draggable = false
+                onNegativeButton()
+            }
+        )
+    }
 }
 
 @Composable
@@ -151,7 +176,10 @@ fun DialogContent(
     onPositiveButton: () -> Unit,
     onNegativeButton: () -> Unit
 ) {
-    Column {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         Spacer(modifier = Modifier.height(32.dp))
         Text(text = "Dialog title")
 
