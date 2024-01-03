@@ -1,4 +1,4 @@
-package com.zcf.composeexercise.pages
+package com.zcf.composeexercise.widget
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterTransition

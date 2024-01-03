@@ -1,4 +1,4 @@
-package com.zcf.composeexercise.pages
+package com.zcf.composeexercise.widget
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterTransition
@@ -48,8 +48,8 @@ import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.zcf.composeexercise.pages.BottomSheetState.Collapsed
-import com.zcf.composeexercise.pages.BottomSheetState.Expanded
+import com.zcf.composeexercise.widget.BottomSheetState.Collapsed
+import com.zcf.composeexercise.widget.BottomSheetState.Expanded
 
 /**
  * Reference 1: https://www.sinasamaki.com/custom-dialog-animation-in-jetpack-compose/

@@ -21,18 +21,27 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.zcf.composeexercise.widget.ANIMATION_DURATION
+import com.zcf.composeexercise.widget.AliasModalBottomSheet
+import com.zcf.composeexercise.widget.AnimatedTransitionDialog
+import com.zcf.composeexercise.widget.AnimatedTransitionDialogWithCallback
+import com.zcf.composeexercise.widget.CustomAnimationDialog
+import com.zcf.composeexercise.widget.CustomAnimationDialog_BottomSheet
+import com.zcf.composeexercise.widget.CustomAnimationDialog_Draggable
 import kotlinx.coroutines.launch
 
 @Composable
 fun AnimatedBottomSheetDialogPage() {
-    val coroutineScope = rememberCoroutineScope()
+    val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
     var showAnimatedTransitionDialog by remember { mutableStateOf(false) }
     var showAnimatedTransitionDialogWithCallback by remember { mutableStateOf(false) }
     var showCustomAnimationDialog by remember { mutableStateOf(false) }
-    var showCustomAnimationDialog_BottomSheet by remember { mutableStateOf(false) }
-    var showCustomAnimationDialog_Draggable by remember { mutableStateOf(false) }
+    var showCustomAnimationDialogBottomSheet by remember { mutableStateOf(false) }
+    var showCustomAnimationDialogDraggable by remember { mutableStateOf(false) }
+    var showAliasModalBottomSheet by remember { mutableStateOf(false) }
+    var showAliasModalBottomSheetDraggable by remember { mutableStateOf(false) }
 
     Column(modifier = Modifier.fillMaxSize()) {
         Button(onClick = {
@@ -54,15 +63,27 @@ fun AnimatedBottomSheetDialogPage() {
         }
 
         Button(onClick = {
-            showCustomAnimationDialog_BottomSheet = true
+            showCustomAnimationDialogBottomSheet = true
         }) {
             Text(text = "Custom animation dialog (Simplified bottom sheet)")
         }
 
         Button(onClick = {
-            showCustomAnimationDialog_Draggable = true
+            showCustomAnimationDialogDraggable = true
         }) {
             Text(text = "Custom animation dialog (Draggable)")
+        }
+
+        Button(onClick = {
+            showAliasModalBottomSheet = true
+        }) {
+            Text(text = "Alias ModalBottomSheet")
+        }
+
+        Button(onClick = {
+            showAliasModalBottomSheetDraggable = true
+        }) {
+            Text(text = "Alias ModalBottomSheet (Draggable)")
         }
 
         Spacer(modifier = Modifier.weight(1f))
@@ -72,14 +93,14 @@ fun AnimatedBottomSheetDialogPage() {
     }
 
     fun onPositiveButton() {
-        coroutineScope.launch {
+        scope.launch {
             println("zcf positive button clicked")
             snackbarHostState.showSnackbar("Positive button clicked")
         }
     }
 
     fun onNegativeButton() {
-        coroutineScope.launch {
+        scope.launch {
             snackbarHostState.showSnackbar("Negative button clicked")
         }
     }
@@ -117,11 +138,11 @@ fun AnimatedBottomSheetDialogPage() {
         ) { dismissCallback ->
             DialogContent(
                 onPositiveButton = {
-                    coroutineScope.launch { dismissCallback() }
+                    scope.launch { dismissCallback() }
                         .invokeOnCompletion { onPositiveButton() }
                 },
                 onNegativeButton = {
-                    coroutineScope.launch { dismissCallback() }
+                    scope.launch { dismissCallback() }
                         .invokeOnCompletion { onNegativeButton() }
                 }
             )
@@ -139,35 +160,81 @@ fun AnimatedBottomSheetDialogPage() {
     }
 
     CustomAnimationDialog_BottomSheet(
-        showDialog = showCustomAnimationDialog_BottomSheet,
-        onDismissRequest = { showCustomAnimationDialog_BottomSheet = false },
+        showDialog = showCustomAnimationDialogBottomSheet,
+        onDismissRequest = { showCustomAnimationDialogBottomSheet = false },
     ) {
         DialogContent(
             onPositiveButton = {
-                showCustomAnimationDialog_BottomSheet = false
+                showCustomAnimationDialogBottomSheet = false
                 onPositiveButton()
             },
             onNegativeButton = {
-                showCustomAnimationDialog_BottomSheet = false
+                showCustomAnimationDialogBottomSheet = false
                 onNegativeButton()
             }
         )
     }
 
     CustomAnimationDialog_Draggable(
-        showDialog = showCustomAnimationDialog_Draggable,
-        onDismissRequest = { showCustomAnimationDialog_Draggable = false },
+        showDialog = showCustomAnimationDialogDraggable,
+        onDismissRequest = { showCustomAnimationDialogDraggable = false },
     ) {
         DialogContent(
             onPositiveButton = {
-                showCustomAnimationDialog_Draggable = false
+                showCustomAnimationDialogDraggable = false
                 onPositiveButton()
             },
             onNegativeButton = {
-                showCustomAnimationDialog_Draggable = false
+                showCustomAnimationDialogDraggable = false
                 onNegativeButton()
             }
         )
+    }
+
+    if (showAliasModalBottomSheet) {
+        AliasModalBottomSheet(
+            onDismissRequest = { showAliasModalBottomSheet = false },
+            isExpandedByDefault = true,
+            isCancelable = false
+        ) { dismissCallback ->
+            DialogContent(
+                onPositiveButton = {
+                    scope.launch {
+                        dismissCallback()
+                        onPositiveButton()
+                    }
+                },
+                onNegativeButton = {
+                    scope.launch {
+                        dismissCallback()
+                        onNegativeButton()
+                    }
+                }
+            )
+        }
+    }
+
+    if (showAliasModalBottomSheetDraggable) {
+        AliasModalBottomSheet(
+            onDismissRequest = { showAliasModalBottomSheetDraggable = false },
+            isExpandedByDefault = true,
+            isCancelable = true
+        ) { dismissCallback ->
+            DialogContent(
+                onPositiveButton = {
+                    scope.launch {
+                        dismissCallback()
+                        onPositiveButton()
+                    }
+                },
+                onNegativeButton = {
+                    scope.launch {
+                        dismissCallback()
+                        onNegativeButton()
+                    }
+                }
+            )
+        }
     }
 }
 
