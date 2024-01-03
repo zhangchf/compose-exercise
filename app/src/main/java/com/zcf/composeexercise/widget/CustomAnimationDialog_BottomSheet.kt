@@ -62,25 +62,27 @@ fun CustomAnimationDialog_BottomSheet(
                 window.setDimAmount(0f)
             }
 
+            var animateIn by remember { mutableStateOf(false) }
+            LaunchedEffect(Unit) { animateIn = true }
+
+            AnimatedVisibility(
+                visible = animateIn && showDialog,
+                enter = fadeIn(),
+                exit = fadeOut()
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .pointerInput(Unit) { detectTapGestures { onDismissRequest() } }
+                        .background(Color.Black.copy(alpha = 0.56f))
+                        .fillMaxSize()
+                )
+            }
+
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.BottomCenter
             ) {
-                var animateIn by remember { mutableStateOf(false) }
-                LaunchedEffect(Unit) { animateIn = true }
-
-                AnimatedVisibility(
-                    visible = animateIn && showDialog,
-                    enter = fadeIn(),
-                    exit = fadeOut()
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .pointerInput(Unit) { detectTapGestures { onDismissRequest() } }
-                            .background(Color.Black.copy(alpha = 0.56f))
-                            .fillMaxSize()
-                    )
-                }
                 AnimatedVisibility(
                     visible = animateIn && showDialog,
                     enter = enter,
