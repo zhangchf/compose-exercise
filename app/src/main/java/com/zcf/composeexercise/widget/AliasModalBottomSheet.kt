@@ -53,7 +53,6 @@ fun AliasModalBottomSheet(
   content: @Composable ColumnScope.(dismissCallback: suspend () -> Unit) -> Unit,
 ) {
   val sheetState = rememberModalBottomSheetState(isExpandedByDefault) { isCancelable }
-  val coroutineScope = rememberCoroutineScope()
 
   suspend fun dismissCallback() {
     sheetState.hide()
@@ -64,49 +63,27 @@ fun AliasModalBottomSheet(
     onDismissRequest = onDismissRequest,
     sheetState = sheetState,
     shape = RectangleShape,
-    containerColor = Color.Transparent,
-    scrimColor = Color.Transparent,
     dragHandle = {},
     properties = ModalBottomSheetDefaults.properties(shouldDismissOnBackPress = isCancelable)
   ) {
-    Box(
-      modifier = Modifier.fillMaxSize(),
-      contentAlignment = Alignment.BottomCenter
-    ) {
-      Box(
-        modifier = Modifier
-          .fillMaxSize()
-          .background(Colors.background80)
-          .pointerInput(Unit) {
-            detectTapGestures {
-              if (isCancelable) {
-                coroutineScope
-                  .launch { sheetState.hide() }
-                  .invokeOnCompletion { onDismissRequest() }
+    Column(
+      modifier = Modifier
+        .navigationBarsPadding()
+        .then(
+          if (!isCancelable) {
+            Modifier.pointerInput(Unit) {
+              awaitEachGesture {
+                val down = awaitFirstDown(requireUnconsumed = false).also { it.consume() }
+                awaitDragOrCancellation(down.id)?.consume()
               }
             }
+          } else {
+            Modifier
           }
-      )
-      Column(
-        modifier = Modifier
-          .navigationBarsPadding()
-          .background(MaterialTheme.colors.surface)
-          .then(
-            if (!isCancelable) {
-              Modifier.pointerInput(Unit) {
-                awaitEachGesture {
-                  val down = awaitFirstDown(requireUnconsumed = false).also { it.consume() }
-                  awaitDragOrCancellation(down.id)?.consume()
-                }
-              }
-            } else {
-              Modifier
-            }
-          )
-      ) {
-        HorizontalDivider(color = Colors.darkGray)
-        content(::dismissCallback)
-      }
+        )
+    ) {
+      HorizontalDivider(color = Colors.darkGray)
+      content(::dismissCallback)
     }
   }
 }

@@ -71,19 +71,19 @@ fun AnimatedBottomSheetDialogPage() {
         Button(onClick = {
             showCustomAnimationDialogDraggable = true
         }) {
-            Text(text = "Custom animation dialog (Draggable)")
+            Text(text = "Custom animation dialog (Draggable) ✓")
         }
 
         Button(onClick = {
             showAliasModalBottomSheet = true
         }) {
-            Text(text = "Alias ModalBottomSheet")
+            Text(text = "Material3 ModalBottomSheet")
         }
 
         Button(onClick = {
             showAliasModalBottomSheetDraggable = true
         }) {
-            Text(text = "Alias ModalBottomSheet (Draggable)")
+            Text(text = "Material3 ModalBottomSheet (Draggable)")
         }
 
         Spacer(modifier = Modifier.weight(1f))
@@ -178,6 +178,7 @@ fun AnimatedBottomSheetDialogPage() {
     CustomAnimationDialog_Draggable(
         showDialog = showCustomAnimationDialogDraggable,
         onDismissRequest = { showCustomAnimationDialogDraggable = false },
+        isCancellable = true
     ) {
         DialogContent(
             onPositiveButton = {

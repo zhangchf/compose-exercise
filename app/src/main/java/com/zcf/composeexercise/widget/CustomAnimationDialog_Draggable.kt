@@ -3,6 +3,7 @@ package com.zcf.composeexercise.widget
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
@@ -12,14 +13,18 @@ import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.FractionalThreshold
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.SwipeableState
 import androidx.compose.material.rememberSwipeableState
@@ -51,7 +56,10 @@ import androidx.compose.ui.window.DialogProperties
 import com.zcf.composeexercise.widget.BottomSheetState.Collapsed
 import com.zcf.composeexercise.widget.BottomSheetState.Expanded
 
+const val DIALOG_ANIM_DURATION = 300
 /**
+ * This is the same as AliasBottomSheetDialog
+ *
  * Reference 1: https://www.sinasamaki.com/custom-dialog-animation-in-jetpack-compose/
  *      gist: https://gist.github.com/sinasamaki/daa825d96235a18822177a2b1b323f49?ref=sinasamaki.com
  *
@@ -63,8 +71,11 @@ import com.zcf.composeexercise.widget.BottomSheetState.Expanded
 fun CustomAnimationDialog_Draggable(
     showDialog: Boolean,
     onDismissRequest: () -> Unit,
-    enter: EnterTransition = slideInVertically { (it * 1.5).toInt() },
-    exit: ExitTransition = slideOutVertically { (it * 1.5).toInt() },
+    isCancellable: Boolean = true,
+    enter: EnterTransition =
+        slideInVertically(tween(DIALOG_ANIM_DURATION)) { it } + fadeIn(tween(DIALOG_ANIM_DURATION)),
+    exit: ExitTransition =
+        slideOutVertically(tween(DIALOG_ANIM_DURATION)) { it } + fadeOut(tween(DIALOG_ANIM_DURATION)),
     content: @Composable () -> Unit
 ) {
     var showAnimatedDialog by remember { mutableStateOf(false) }
@@ -76,14 +87,19 @@ fun CustomAnimationDialog_Draggable(
     if (showAnimatedDialog) {
         Dialog(
             onDismissRequest = onDismissRequest,
-            properties = DialogProperties(usePlatformDefaultWidth = false)
+            properties = DialogProperties(
+                dismissOnBackPress = isCancellable,
+                dismissOnClickOutside = isCancellable,
+                usePlatformDefaultWidth = false
+            )
         ) {
             findDialogWindowProviderInParent(LocalView.current)?.window?.let { window ->
                 window.setWindowAnimations(-1)
                 window.setDimAmount(0f)
             }
 
-            val estimatedTotalHeight = 200f // this value is not important, but has to be different with the Expanded offset 0f.
+            // this value is not important, but has to be different with the Expanded offset 0f.
+            val estimatedTotalHeight = 200f
             var totalHeight by remember { mutableFloatStateOf(estimatedTotalHeight) }
             val swipeableState = rememberSwipeableState(initialValue = Expanded) { state ->
                 if (state == Collapsed) {
@@ -91,13 +107,15 @@ fun CustomAnimationDialog_Draggable(
                 }
                 true
             }
-            val lazyListState = rememberLazyListState()
+            //  val lazyListState = rememberLazyListState()
+            val innerScrollState = rememberScrollState()
 
             val nestedConnection = remember {
                 BottomSheetNestedScrollConnection(
                     swipeableState = swipeableState,
                     innerScrollableReachedTop = {
-                        lazyListState.firstVisibleItemIndex == 0 && lazyListState.firstVisibleItemScrollOffset == 0
+//                        lazyListState.firstVisibleItemIndex == 0 && lazyListState.firstVisibleItemScrollOffset == 0
+                        innerScrollState.value == 0
                     }
                 )
             }
@@ -114,12 +132,19 @@ fun CustomAnimationDialog_Draggable(
                     modifier = Modifier
                         .background(Color.Black.copy(alpha = 0.56f))
                         .fillMaxSize()
-                        .pointerInput(Unit) {
-                            detectTapGestures { onDismissRequest() }
-                        }
-                        .pointerInput(Unit) {
-                            detectDragGestures { change, dragAmount ->  }
-                        }
+                        .then(
+                            if (isCancellable) {
+                                Modifier
+                                    .pointerInput(Unit) {
+                                        detectTapGestures { onDismissRequest() }
+                                    }
+                                    .pointerInput(Unit) {
+                                        detectDragGestures { change, dragAmount -> }
+                                    }
+                            } else {
+                                Modifier
+                            }
+                        )
                 )
             }
 
@@ -132,29 +157,49 @@ fun CustomAnimationDialog_Draggable(
                     enter = enter,
                     exit = exit
                 ) {
-                    val roundedShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
+                    val roundedShape = RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)
                     Box(
                         modifier = Modifier
-                            .onGloballyPositioned {
-                                totalHeight = it.size.height.toFloat()
-                            }
-                            .offset { IntOffset(0, swipeableState.offset.value.toInt()) }
-                            .swipeable(
-                                state = swipeableState,
-                                anchors = mapOf(0f to Expanded, totalHeight + 100f to Collapsed),
-                                orientation = Orientation.Vertical,
+                            .then(
+                                if (isCancellable) {
+                                    Modifier
+                                        .onGloballyPositioned {
+                                            totalHeight = it.size.height.toFloat()
+                                        }
+                                        .offset {
+                                            IntOffset(
+                                                0,
+                                                swipeableState.offset.value.toInt()
+                                            )
+                                        }
+                                        .swipeable(
+                                            state = swipeableState,
+                                            anchors = mapOf(
+                                                0f to Expanded,
+                                                totalHeight + 100f to Collapsed
+                                            ),
+                                            orientation = Orientation.Vertical,
+                                            thresholds = {_, _ -> FractionalThreshold(0.7f)}
+                                        )
+                                        .nestedScroll(nestedConnection)
+                                } else {
+                                    Modifier
+                                }
                             )
-                            .nestedScroll(nestedConnection)
                             .fillMaxWidth()
-                            .heightIn(max = 500.dp)
+//                            .heightIn(max = 500.dp) // for testing
                             .clip(roundedShape)
                             .background(MaterialTheme.colors.surface),
                         contentAlignment = Alignment.BottomCenter
                     ) {
-                        LazyColumn(
-                            state = lazyListState
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .verticalScroll(innerScrollState)
                         ) {
-                            items(5) {
+                            Column {
+                                content()
+                                content()
                                 content()
                             }
                         }
@@ -170,6 +215,7 @@ fun CustomAnimationDialog_Draggable(
         }
     }
 }
+
 @OptIn(ExperimentalMaterialApi::class)
 private class BottomSheetNestedScrollConnection(
     val swipeableState: SwipeableState<BottomSheetState>,

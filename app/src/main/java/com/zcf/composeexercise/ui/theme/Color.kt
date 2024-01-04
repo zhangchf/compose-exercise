@@ -1,5 +1,6 @@
 package com.zcf.composeexercise.ui.theme
 
+import androidx.compose.material.darkColors
 import androidx.compose.ui.graphics.Color
 
 val Purple200 = Color(0xFFBB86FC)
@@ -8,7 +9,8 @@ val Purple700 = Color(0xFF3700B3)
 val Teal200 = Color(0xFF03DAC5)
 
 object Colors {
-    val links = Color(0xFF7856FF)
+    val primary = Color(0xFF7856FF)
+    val links = primary
     val links50 = Color(0x807856FF)
     val vacationMode = Color(0xFFA4A4A4)
 
@@ -25,10 +27,13 @@ object Colors {
     val darkGray50 = Color(0x80272727)
 
     val background = Color(0xFF111111)
+    val background98 = Color(0xFA111111)
     val background80 = Color(0xCC111111)
     val background50 = Color(0x80111111)
     val transparentBackground = Color(0xF2111111)
     val transparentGray50 = Color(0x80C4C4C4)
+
+    val dimBackground = Color(0x80000000)
 
     val ripple = Color(0x33FFFFFF)
     val rippleDark = Color(0x33121212)
@@ -40,4 +45,6 @@ object Colors {
 
     val highlight = Color(0xFFD6FE36)
     val offBlack = Color(0xFF1A1A1A)
+
+    val white = Color(0xFFFFFFFF)
 }
