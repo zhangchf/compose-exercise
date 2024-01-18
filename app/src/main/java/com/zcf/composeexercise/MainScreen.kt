@@ -1,11 +1,18 @@
 package com.zcf.composeexercise
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
+import androidx.compose.material.Chip
+import androidx.compose.material.ChipDefaults
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
@@ -14,12 +21,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.*
 import androidx.navigation.compose.composable
 import com.zcf.composeexercise.pages.*
 import com.zcf.composeexercise.todos.TodoItem
 import com.zcf.composeexercise.todos.TodosListView
+import com.zcf.composeexercise.ui.theme.Colors
 
+@OptIn(ExperimentalLayoutApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun MainScreen(navController: NavController) {
     Scaffold(
@@ -30,16 +40,31 @@ fun MainScreen(navController: NavController) {
             }
         }
     ) { paddingValues ->
-        LazyColumn(
-            modifier = Modifier
-                .padding(paddingValues)
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.SpaceEvenly,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            items(MainScreenRoutes.values()) { route ->
-                Button(onClick = { navController.navigate(route.key) }) {
-                    Text(route.displayName)
+//        LazyColumn(
+//            modifier = Modifier
+//                .padding(paddingValues)
+//                .fillMaxSize(),
+//            verticalArrangement = Arrangement.SpaceEvenly,
+//            horizontalAlignment = Alignment.CenterHorizontally
+//        ) {
+//            items(MainScreenRoutes.values()) { route ->
+//                Button(onClick = { navController.navigate(route.key) }) {
+//                    Text(route.displayName)
+//                }
+//            }
+//        }
+
+        FlowRow(modifier = Modifier.padding(paddingValues)) {
+            MainScreenRoutes.entries.forEach { route ->
+                Button(
+                    onClick = { navController.navigate(route.key) },
+                    modifier = Modifier.padding(horizontal = 4.dp),
+                    shape = RoundedCornerShape(16.dp)
+                ) {
+                    Text(
+                        text = route.displayName,
+                        style = MaterialTheme.typography.button
+                    )
                 }
             }
         }
