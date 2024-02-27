@@ -2,27 +2,34 @@ package com.zcf.composeexercise.pages
 
 import android.graphics.Paint
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Scaffold
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.res.ResourcesCompat
 import androidx.navigation.NavController
 import kotlinx.coroutines.*
 import com.zcf.composeexercise.R
+import com.zcf.composeexercise.ui.theme.Colors
 
 @Composable
-fun canvasPage(navController: NavController) {
+fun CanvasPage(navController: NavController) {
     Scaffold(
         topBar = {
             TopAppBar {
@@ -30,27 +37,17 @@ fun canvasPage(navController: NavController) {
             }
         },
         bottomBar = {}
-    ) {
+    ) { paddingValues ->
         Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier = Modifier.padding(paddingValues)
         ) {
-            InstagramIcon { }
-            FacebookIcon()
+            Row {
+                InstagramIcon { }
+                FacebookIcon()
+            }
 
+            Scanner(modifier = Modifier.size(200.dp))
         }
-    }
-}
-
-suspend fun backgroundWork() {
-    coroutineScope {
-        val result = async {
-            delay(10000)
-            "terere"
-        }
-
-        launch {  }
-        println("result: ${result.await()}")
     }
 }
 
@@ -99,5 +96,43 @@ fun FacebookIcon() {
             cornerRadius = CornerRadius(20f)
         )
         drawContext.canvas.nativeCanvas.drawText("f", size.width * 0.5f, size.height * 0.9f, textPaint)
+    }
+}
+
+@Composable
+fun Scanner(
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+    ) {
+        Image(painter = painterResource(id = R.drawable.sky_sea_mountain), contentDescription = "")
+        ScannerBackground(modifier = Modifier.fillMaxSize())
+    }
+}
+
+/**
+ * Reference: https://stackoverflow.com/a/71986794/6527112
+ * Use graphicsLayer to create a separate layer, so BlendMode.Clear(PorterDuffMode) can work.
+ */
+@Composable
+fun ScannerBackground(
+    modifier: Modifier = Modifier
+) {
+    Canvas(
+        modifier = modifier
+            .fillMaxSize()
+            .graphicsLayer {
+                alpha = 0.99f
+            }
+    ) {
+        val canvasSize = this.size
+        drawRect(Color.Black.copy(alpha = 0.5f))
+        drawRect(
+            color = Color.Transparent,
+            topLeft = Offset(canvasSize.width/4, canvasSize.height/4),
+            size = Size(canvasSize.width/2, canvasSize.height/2),
+            blendMode = BlendMode.Clear
+        )
     }
 }
