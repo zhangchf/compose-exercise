@@ -1,4 +1,4 @@
-package com.zcf.composeexercise.pages
+package com.zcf.composeexercise.widget
 
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.Text
