@@ -92,6 +92,7 @@ dependencies {
 //  implementation "androidx.lifecycle:lifecycle-viewmodel-compose:2.4.0-rc01"
 
   implementation 'dnsjava:dnsjava:3.5.2'
+  implementation 'org.minidns:minidns-hla:1.0.5'
 
   testImplementation 'junit:junit:4.13.2'
   androidTestImplementation 'androidx.test.ext:junit:1.1.5'
