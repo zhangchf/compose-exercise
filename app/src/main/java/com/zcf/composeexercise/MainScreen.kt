@@ -76,7 +76,7 @@ enum class MainScreenRoutes(val key: String, val displayName: String) {
     MirrorPage("mirrorPage", "Mirror Effect"),
     ParallaxPage("parallaxPage", "Parallax"),
     PriceAnalyticsPage("priceAnalyticsPage", "Price Analytics Page"),
-    TextToolbarPage("textToolbarPage", "Text Toolbar"),
+    TextsPage("textsPage", "Texts"),
     AnimatedTransitionDialog("animatedTransitionDialog", "Animated Transition Dialog"),
     NegativePaddingsPage("negativePaddings", "Negative Paddings"),
 }
@@ -136,8 +136,8 @@ fun NavGraphBuilder.mainScreenNavGraph(navController: NavController) {
         composable(MainScreenRoutes.PriceAnalyticsPage.key) {
             PriceAnalyticsView()
         }
-        composable(MainScreenRoutes.TextToolbarPage.key) {
-            TextToolbarPage()
+        composable(MainScreenRoutes.TextsPage.key) {
+            Texts()
         }
         composable(MainScreenRoutes.AnimatedTransitionDialog.key) {
             AnimatedBottomSheetDialogPage()

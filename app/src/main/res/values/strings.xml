@@ -22,4 +22,8 @@ There are many variations of passages of Lorem Ipsum available, but the majority
     <item quantity="many" />
     <item quantity="other">%d Orders</item>
   </plurals>
+
+  <string name="damagedBoxBody">A box is considered damaged if it has sustained visible and excessive damage. Examples include:\n\n<annotation tag="bullet">Structural damage to the point where the box does not fully protect the shoe</annotation>\n<annotation tag="bullet">Severely dented exterior</annotation>\n<annotation tag="bullet">Numerous cuts and holes</annotation></string>
+  <string name="damagedBoxBody1">A box is considered damaged if it has sustained visible and excessive damage. Examples include:\n<annotation tag="bullet">Structural damage to the point where the box does not fully protect the shoe</annotation><annotation tag="bullet">Severely dented exterior</annotation>abc<annotation tag="bullet">Numerous cuts and holes</annotation></string>
+
 </resources>
