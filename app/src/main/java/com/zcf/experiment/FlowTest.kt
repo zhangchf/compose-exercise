@@ -2,6 +2,7 @@ package com.zcf.experiment
 
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
 import java.lang.Exception
@@ -26,6 +27,7 @@ fun main() = runBlocking {
 
     coroutineScope {
         dataFlow()
+            .onEach { delay(200) }
             .catch { e -> println("exception: $e") }
 //            .collect { error("throws error") }
             .collect { println(it) }
