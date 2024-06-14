@@ -3,15 +3,20 @@ package com.zcf.composeexercise.pages
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.Text
+import androidx.compose.material.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -23,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.zcf.composeexercise.widget.ANIMATION_DURATION
 import com.zcf.composeexercise.widget.AliasModalBottomSheet
+import com.zcf.composeexercise.widget.AnimatedDialog
 import com.zcf.composeexercise.widget.AnimatedTransitionDialog
 import com.zcf.composeexercise.widget.AnimatedTransitionDialogWithCallback
 import com.zcf.composeexercise.widget.CustomAnimationDialog
@@ -42,6 +48,9 @@ fun AnimatedBottomSheetDialogPage() {
     var showCustomAnimationDialogDraggable by remember { mutableStateOf(false) }
     var showAliasModalBottomSheet by remember { mutableStateOf(false) }
     var showAliasModalBottomSheetDraggable by remember { mutableStateOf(false) }
+
+    // AnimatedDialog by kappdev
+    var showAnimateDialogByKappdev by remember { mutableStateOf(false) }
 
     Column(modifier = Modifier.fillMaxSize()) {
         Button(onClick = {
@@ -84,6 +93,12 @@ fun AnimatedBottomSheetDialogPage() {
             showAliasModalBottomSheetDraggable = true
         }) {
             Text(text = "Material3 ModalBottomSheet (Draggable)")
+        }
+        
+        Button(onClick = {
+            showAnimateDialogByKappdev = true
+        }) {
+            Text(text = "AnimatedDialog by Kappdev")
         }
 
         Spacer(modifier = Modifier.weight(1f))
@@ -235,6 +250,45 @@ fun AnimatedBottomSheetDialogPage() {
                     }
                 }
             )
+        }
+    }
+    
+    if (showAnimateDialogByKappdev) {
+        AnimatedDialog(
+            onDismiss = { showAnimateDialogByKappdev = false }
+        ) { triggerDismiss ->
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        color = MaterialTheme.colors.surface,
+                        shape = RoundedCornerShape(24.dp)
+                    )
+                    .padding(16.dp)
+            ) {
+                Text(
+                    text = "👏 Clap Alert Dialog",
+                    color = MaterialTheme.colors.contentColorFor(MaterialTheme.colors.surface),
+                    style = MaterialTheme.typography.h1
+                )
+
+                Spacer(Modifier.height(8.dp))
+
+                Text(
+                    text = "Please show your appreciation by hitting the clap button.",
+                    color = MaterialTheme.colors.contentColorFor(MaterialTheme.colors.surface),
+                    style = MaterialTheme.typography.body1
+                )
+
+                Spacer(Modifier.height(16.dp))
+
+                Button(
+                    onClick = triggerDismiss,
+                    modifier = Modifier.align(Alignment.End)
+                ) {
+                    Text("Clap")
+                }
+            }
         }
     }
 }
