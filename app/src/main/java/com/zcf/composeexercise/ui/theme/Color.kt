@@ -34,6 +34,7 @@ object Colors {
     val transparentGray50 = Color(0x80C4C4C4)
 
     val dimBackground = Color(0x80000000)
+    val black40 = Color(0x66000000)
 
     val ripple = Color(0x33FFFFFF)
     val rippleDark = Color(0x33121212)
@@ -47,4 +48,13 @@ object Colors {
     val offBlack = Color(0xFF1A1A1A)
 
     val white = Color(0xFFFFFFFF)
+    val flightClubRed = Color(0xFFE91C23)
+
+
+    val materialColors = darkColors(
+        primary = links,
+        primaryVariant = Color.Black,
+        secondary = links,
+        background = background
+    )
 }

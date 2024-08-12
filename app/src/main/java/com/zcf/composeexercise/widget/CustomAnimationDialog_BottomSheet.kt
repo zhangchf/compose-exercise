@@ -111,17 +111,3 @@ fun CustomAnimationDialog_BottomSheet(
         }
     }
 }
-
-/**
- * Reference: [findDialogWindowProviderInParent] method in [AndroidImageHelpers.android.kt]
- */
-internal fun findDialogWindowProviderInParent(view: View): DialogWindowProvider? {
-    if (view is DialogWindowProvider) {
-        return view
-    }
-    val parent = view.parent ?: return null
-    if (parent is View) {
-        return findDialogWindowProviderInParent(parent)
-    }
-    return null
-}

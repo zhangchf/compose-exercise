@@ -79,6 +79,7 @@ enum class MainScreenRoutes(val key: String, val displayName: String) {
     TextsPage("textsPage", "Texts"),
     AnimatedTransitionDialog("animatedTransitionDialog", "Animated Transition Dialog"),
     NegativePaddingsPage("negativePaddings", "Negative Paddings"),
+    PhotoHarvestingPage("photoHarvesting", "Photo Harvesting")
 }
 
 fun NavGraphBuilder.mainScreenNavGraph(navController: NavController) {
@@ -144,6 +145,9 @@ fun NavGraphBuilder.mainScreenNavGraph(navController: NavController) {
         }
         composable(MainScreenRoutes.NegativePaddingsPage.key) {
             NegativePaddingsPage()
+        }
+        composable(MainScreenRoutes.PhotoHarvestingPage.key) {
+            PhotoHarvestingPage()
         }
     }
 }

@@ -56,7 +56,6 @@ import androidx.compose.ui.window.DialogProperties
 import com.zcf.composeexercise.widget.BottomSheetState.Collapsed
 import com.zcf.composeexercise.widget.BottomSheetState.Expanded
 
-const val DIALOG_ANIM_DURATION = 300
 /**
  * This is the same as AliasBottomSheetDialog
  *
@@ -214,54 +213,4 @@ fun CustomAnimationDialog_Draggable(
             }
         }
     }
-}
-
-@OptIn(ExperimentalMaterialApi::class)
-private class BottomSheetNestedScrollConnection(
-    val swipeableState: SwipeableState<BottomSheetState>,
-    val innerScrollableReachedTop: () -> Boolean
-) : NestedScrollConnection {
-    override fun onPreScroll(
-        available: Offset,
-        source: NestedScrollSource
-    ): Offset {
-        val delta = available.y
-        return if (delta < 0) {
-            swipeableState.performDrag(delta).toOffset()
-        } else {
-            Offset.Zero
-        }
-    }
-
-    override fun onPostScroll(
-        consumed: Offset,
-        available: Offset,
-        source: NestedScrollSource
-    ): Offset {
-        val delta = available.y
-        return swipeableState.performDrag(delta).toOffset()
-    }
-
-    override suspend fun onPreFling(available: Velocity): Velocity {
-        return if (available.y < 0 && innerScrollableReachedTop()) {
-            swipeableState.performFling(available.y)
-            available
-        } else {
-            Velocity.Zero
-        }
-    }
-
-    override suspend fun onPostFling(
-        consumed: Velocity,
-        available: Velocity
-    ): Velocity {
-        swipeableState.performFling(velocity = available.y)
-        return available
-    }
-
-    private fun Float.toOffset() = Offset(0f, this)
-}
-
-private enum class BottomSheetState {
-    Expanded, Collapsed
 }
