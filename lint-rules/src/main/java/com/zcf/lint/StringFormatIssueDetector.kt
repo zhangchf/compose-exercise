@@ -1,4 +1,4 @@
-package org.alias.lint
+package com.zcf.lint
 
 import com.android.AndroidXConstants.CLASS_V4_FRAGMENT
 import com.android.SdkConstants
@@ -26,7 +26,6 @@ import com.android.utils.text
 import com.intellij.psi.PsiMethod
 import org.jetbrains.uast.UCallExpression
 import org.w3c.dom.Element
-import java.util.Arrays
 import java.util.EnumSet
 
 /**
@@ -38,11 +37,13 @@ import java.util.EnumSet
  */
 class StringFormatIssueDetector : ResourceXmlDetector(), SourceCodeScanner {
 
-  private data class ElementInfo(val value: String, val placeholders: List<String>, val handle: Handle)
+  private data class ElementInfo(val value: String, val folder: String, val placeholders: List<String>, val handle: Handle)
 
   private val placeholderRegex = Regex("%[123]\\$[sd]")
 
   private var elementInfoMap: MutableMap<String, MutableList<ElementInfo>> = mutableMapOf()
+
+  private fun List<ElementInfo>.baseElement() = firstOrNull { it.folder == "values" }
 
   override fun appliesTo(folderType: ResourceFolderType): Boolean {
     return folderType == VALUES
@@ -53,7 +54,7 @@ class StringFormatIssueDetector : ResourceXmlDetector(), SourceCodeScanner {
   }
 
   override fun getApplicableMethodNames(): List<String>? {
-    return Arrays.asList(SdkConstants.FORMAT_METHOD, SdkConstants.GET_STRING_METHOD)
+    return listOf(SdkConstants.FORMAT_METHOD, SdkConstants.GET_STRING_METHOD)
   }
 
   override fun visitElement(context: XmlContext, element: Element) {
@@ -61,10 +62,11 @@ class StringFormatIssueDetector : ResourceXmlDetector(), SourceCodeScanner {
     val value = element.text()
     val placeholders = placeholderRegex.findAll(value).map { it.value }.toList().sorted()
 
-    if (placeholders.isNotEmpty()) {
+    if (placeholders.isNotEmpty() || elementInfoMap[name] != null) {
+      val folder = context.file.parentFile.name
       val handle = context.createLocationHandle(element)
       elementInfoMap[name] = (elementInfoMap[name] ?: mutableListOf()).also {
-        it.add(ElementInfo(value, placeholders, handle))
+        it.add(ElementInfo(value, folder, placeholders, handle))
       }
     }
   }
@@ -75,14 +77,14 @@ class StringFormatIssueDetector : ResourceXmlDetector(), SourceCodeScanner {
       val name = entry.key
       val list = entry.value
 
-      val basePlaceholders = list[0].placeholders.joinToString()
+      val basePlaceholders = list.baseElement()?.placeholders?.joinToString()
       val incorrectIndex = list.indexOfFirst { it.placeholders.joinToString() != basePlaceholders }
       if (incorrectIndex != -1) {
         val elementInfo = list[incorrectIndex]
         context.report(
           issue = UNMATCHED_FORMAT_PLACEHOLDERS,
           location = elementInfo.handle.resolve(),
-          message = "Incorrect placeholders for $name: ${elementInfo.value} <---> ${list[0].value}"
+          message = "Incorrect placeholders for $name: ${elementInfo.value} <---> ${list.baseElement()?.value ?: ""}"
         )
       }
     }
@@ -167,10 +169,10 @@ class StringFormatIssueDetector : ResourceXmlDetector(), SourceCodeScanner {
   }
 
   companion object {
-    private val IMPLEMENTATION_XML = Implementation(
+    val IMPLEMENTATION_XML = Implementation(
       StringFormatIssueDetector::class.java, ALL_RESOURCES_SCOPE
     )
-    private val IMPLEMENTATION_XML_AND_JAVA = Implementation(
+    val IMPLEMENTATION_XML_AND_JAVA = Implementation(
       StringFormatIssueDetector::class.java,
       EnumSet.of<Scope>(ALL_RESOURCE_FILES, JAVA_FILE),
       JAVA_FILE_SCOPE

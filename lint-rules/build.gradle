@@ -9,7 +9,10 @@ java {
 }
 
 dependencies {
-    def lintVersion = "31.2.0"
-    compileOnly "com.android.tools.lint:lint-api:$lintVersion"
+    def lintVersion = "31.2.0" // gradle plugin version + 23
+    implementation "com.android.tools.lint:lint-api:$lintVersion"
     compileOnly "com.android.tools.lint:lint-checks:$lintVersion"
+
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation "com.android.tools.lint:lint-tests:$lintVersion"
 }

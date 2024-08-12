@@ -4,6 +4,7 @@ import com.android.tools.lint.client.api.IssueRegistry
 import com.android.tools.lint.client.api.Vendor
 import com.android.tools.lint.detector.api.CURRENT_API
 import com.android.tools.lint.detector.api.Issue
+import com.zcf.lint.StringFormatIssueDetector
 
 class StringFormatIssueRegistry : IssueRegistry() {
   override val issues: List<Issue> = StringFormatIssueDetector.getIssues()
