@@ -2,12 +2,12 @@ package com.zcf.lint
 
 import com.android.tools.lint.checks.infrastructure.LintDetectorTest
 
+const val dollar = "$"
+
 class StringFormatIssueDetectorTest : LintDetectorTest() {
     override fun getDetector() = StringFormatIssueDetector()
 
     override fun getIssues() = StringFormatIssueDetector.getIssues()
-
-    private val dollar = "$"
 
     fun testNoErrorWhenCheckStringsWithNoArguments() {
         val stubFileEN = xml(
@@ -155,5 +155,30 @@ class StringFormatIssueDetectorTest : LintDetectorTest() {
             .files(stubFileEN, stubFileCN)
             .run()
             .expectErrorCount(1)
+    }
+
+    fun testNoErrorWhenOnlyEnglish() {
+        val stubFileEN = xml(
+            "res/values/strings.xml",
+            """
+            <resources>
+              <string name="key1">EN string %1${dollar}s xxx xxx</string>
+              <string name="key2">EN string %1${dollar}d yyy %1${dollar}s yyy</string>
+            </resources>
+            """.trimIndent()
+        )
+
+        val stubFileCN = xml(
+            "res/values-zh/strings.xml",
+            """
+            <resources>
+            </resources>
+            """.trimIndent()
+        )
+
+        lint()
+            .files(stubFileEN, stubFileCN)
+            .run()
+            .expectClean()
     }
 }

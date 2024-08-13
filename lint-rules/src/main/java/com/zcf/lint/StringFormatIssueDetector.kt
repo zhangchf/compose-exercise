@@ -28,6 +28,9 @@ import org.jetbrains.uast.UCallExpression
 import org.w3c.dom.Element
 import java.util.EnumSet
 
+
+val placeholderRegex = Regex("%[12345]\\$[sd]")
+
 /**
  * Reference:
  * https://proandroiddev.com/implementing-your-first-android-lint-rule-6e572383b292
@@ -37,9 +40,7 @@ import java.util.EnumSet
  */
 class StringFormatIssueDetector : ResourceXmlDetector(), SourceCodeScanner {
 
-  private data class ElementInfo(val value: String, val folder: String, val placeholders: List<String>, val handle: Handle)
-
-  private val placeholderRegex = Regex("%[123]\\$[sd]")
+  private data class ElementInfo(val text: String, val placeholders: List<String>, val folder: String, val handle: Handle)
 
   private var elementInfoMap: MutableMap<String, MutableList<ElementInfo>> = mutableMapOf()
 
@@ -66,7 +67,7 @@ class StringFormatIssueDetector : ResourceXmlDetector(), SourceCodeScanner {
       val folder = context.file.parentFile.name
       val handle = context.createLocationHandle(element)
       elementInfoMap[name] = (elementInfoMap[name] ?: mutableListOf()).also {
-        it.add(ElementInfo(value, folder, placeholders, handle))
+        it.add(ElementInfo(value, placeholders, folder, handle))
       }
     }
   }
@@ -84,7 +85,7 @@ class StringFormatIssueDetector : ResourceXmlDetector(), SourceCodeScanner {
         context.report(
           issue = UNMATCHED_FORMAT_PLACEHOLDERS,
           location = elementInfo.handle.resolve(),
-          message = "Incorrect placeholders for $name: ${elementInfo.value} <---> ${list.baseElement()?.value ?: ""}"
+          message = "Incorrect placeholders for $name: ${elementInfo.text} <---> ${list.baseElement()?.text ?: ""}"
         )
       }
     }

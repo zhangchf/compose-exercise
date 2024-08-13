@@ -3,6 +3,12 @@ plugins {
     id 'org.jetbrains.kotlin.jvm'
 }
 
+jar {
+    manifest {
+        attributes('Lint-Registry-v2': 'org.alias.lint.StringFormatIssueRegistry')
+    }
+}
+
 java {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17

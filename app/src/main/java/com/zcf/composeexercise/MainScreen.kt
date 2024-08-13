@@ -27,7 +27,7 @@ fun MainScreen(navController: NavController) {
         topBar = {
             TopAppBar {
 //                Text(text = stringResource(id = R.string.mainScreenTitle))
-                Text(text = pluralStringResource(id = R.plurals.ordersCounter, 0, 0))
+                Text(text = pluralStringResource(id = R.plurals.ordersCounter, 1000))
             }
         }
     ) { paddingValues ->
