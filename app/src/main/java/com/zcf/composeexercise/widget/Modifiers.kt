@@ -11,6 +11,7 @@ import androidx.compose.foundation.gestures.horizontalDrag
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.overscroll
+import androidx.compose.material.ripple
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -128,7 +129,7 @@ fun Modifier.clickableWithRoundRipple(onClick: () -> Unit): Modifier {
     interactionSource = remember {
       MutableInteractionSource()
     },
-    indication = rememberRipple(bounded = false),
+    indication = ripple(bounded = false),
     onClick = onClick
   )
 }
