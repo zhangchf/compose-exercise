@@ -13,5 +13,5 @@ dependencyResolutionManagement {
   }
 }
 rootProject.name = "ComposeExcersise"
-include ':app'
-include ':lint-rules'
+include(":app")
+include(":lint-rules")
