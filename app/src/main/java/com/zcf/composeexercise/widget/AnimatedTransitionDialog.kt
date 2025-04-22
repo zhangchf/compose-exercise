@@ -43,75 +43,75 @@ private const val DIALOG_BUILD_TIME = 0L
  */
 @Composable
 fun AnimatedTransitionDialog(
-    onDismissRequest: () -> Unit,
-    enter: EnterTransition = fadeIn() + expandIn(),
-    exit: ExitTransition = shrinkOut() + fadeOut(),
-    animationDuration: Int = ANIMATION_DURATION,
-    content: @Composable (AnimatedTransitionDialogHelper) -> Unit
+  onDismissRequest: () -> Unit,
+  enter: EnterTransition = fadeIn() + expandIn(),
+  exit: ExitTransition = shrinkOut() + fadeOut(),
+  animationDuration: Int = ANIMATION_DURATION,
+  content: @Composable (AnimatedTransitionDialogHelper) -> Unit
 ) {
-    val coroutineScope = rememberCoroutineScope()
-    var animatedVisible by remember { mutableStateOf(false) }
-    val onDismissFlow = remember { MutableSharedFlow<Any>() }
+  val coroutineScope = rememberCoroutineScope()
+  var animatedVisible by remember { mutableStateOf(false) }
+  val onDismissFlow = remember { MutableSharedFlow<Any>() }
 
-    fun startDismissWithExitAnimation() = coroutineScope.launch {
-        animatedVisible = false
-        delay(animationDuration.toLong())
-    }.invokeOnCompletion {
-        onDismissRequest()
+  fun startDismissWithExitAnimation() = coroutineScope.launch {
+    animatedVisible = false
+    delay(animationDuration.toLong())
+  }.invokeOnCompletion {
+    onDismissRequest()
+  }
+
+  LaunchedEffect(Unit) {
+    launch {
+      delay(DIALOG_BUILD_TIME)
+      animatedVisible = true
     }
 
-    LaunchedEffect(Unit) {
-        launch {
-            delay(DIALOG_BUILD_TIME)
-            animatedVisible = true
-        }
-
-        launch {
-            onDismissFlow.collectLatest {
-                startDismissWithExitAnimation()
-            }
-        }
+    launch {
+      onDismissFlow.collectLatest {
+        startDismissWithExitAnimation()
+      }
     }
+  }
 
-    Dialog(
-        onDismissRequest = {
-            startDismissWithExitAnimation()
-        },
-        properties = DialogProperties(usePlatformDefaultWidth = false)
+  Dialog(
+    onDismissRequest = {
+      startDismissWithExitAnimation()
+    },
+    properties = DialogProperties(usePlatformDefaultWidth = false)
+  ) {
+    Box(
+      modifier = Modifier.fillMaxSize(),
+      contentAlignment = Alignment.BottomCenter
     ) {
+      AnimatedVisibility(
+        visible = animatedVisible,
+        enter = enter,
+        exit = exit
+      ) {
         Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.BottomCenter
+          modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = 200.dp)
+            .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp))
+            .background(Colors.windowBackground),
+          contentAlignment = Alignment.Center
         ) {
-            AnimatedVisibility(
-                visible = animatedVisible,
-                enter = enter,
-                exit = exit
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(min = 200.dp)
-                        .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp))
-                        .background(Colors.windowBackground),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CompositionLocalProvider(LocalContentColor provides Colors.gray3Solid) {
-                        content(AnimatedTransitionDialogHelper(coroutineScope, onDismissFlow))
-                    }
-                }
-            }
+          CompositionLocalProvider(LocalContentColor provides Colors.gray3Solid) {
+            content(AnimatedTransitionDialogHelper(coroutineScope, onDismissFlow))
+          }
         }
+      }
     }
+  }
 }
 
 class AnimatedTransitionDialogHelper(
-    private val coroutineScope: CoroutineScope,
-    private val onDismissFlow: MutableSharedFlow<Any>
+  private val coroutineScope: CoroutineScope,
+  private val onDismissFlow: MutableSharedFlow<Any>
 ) {
-    fun triggerAnimatedDismiss() {
-        coroutineScope.launch {
-            onDismissFlow.emit(Any())
-        }
+  fun triggerAnimatedDismiss() {
+    coroutineScope.launch {
+      onDismissFlow.emit(Any())
     }
+  }
 }

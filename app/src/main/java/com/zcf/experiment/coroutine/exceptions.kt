@@ -3,7 +3,7 @@ package com.zcf.experiment.coroutine
 import kotlinx.coroutines.*
 
 val rootExceptionHandler = CoroutineExceptionHandler { coroutineContext, throwable ->
-    println("rootExceptionHandler: $coroutineContext, $throwable")
+  println("rootExceptionHandler: $coroutineContext, $throwable")
 }
 
 @OptIn(DelicateCoroutinesApi::class)
@@ -20,25 +20,25 @@ fun main() = runBlocking(rootExceptionHandler) {
 //        println("Caught IndexOutOfBoundsException")
 //    }
 
-    try {
-        supervisorScope {
-            val child = launch {
-                try {
-                    println("The child is sleeping")
-                    delay(Long.MAX_VALUE)
-                } finally {
-                    println("The child is cancelled")
-                }
-            }
-            println("Before yield")
-            // Give our child a chance to execute and print using yield
-            yield()
-            println("Throwing an exception from the scope")
-            throw AssertionError()
+  try {
+    supervisorScope {
+      val child = launch {
+        try {
+          println("The child is sleeping")
+          delay(Long.MAX_VALUE)
+        } finally {
+          println("The child is cancelled")
         }
-    } catch(e: AssertionError) {
-        println("Caught an assertion error")
+      }
+      println("Before yield")
+      // Give our child a chance to execute and print using yield
+      yield()
+      println("Throwing an exception from the scope")
+      throw AssertionError()
     }
+  } catch (e: AssertionError) {
+    println("Caught an assertion error")
+  }
 
 //    val exceptionHandler = CoroutineExceptionHandler { coroutineContext, throwable ->
 //        println("exceptionHandler: $coroutineContext, $throwable")
@@ -50,15 +50,15 @@ fun main() = runBlocking(rootExceptionHandler) {
 //    println("Before job join")
 //    job.join()
 //    println("After job join")
-    val deferred = GlobalScope.async {
-        delay(3000)// root coroutine with async
-        println("Throwing exception from async")
-        throw ArithmeticException() // Nothing is printed, relying on user to call await
-    }
-    try {
-        deferred.await()
-        println("Unreached")
-    } catch (e: ArithmeticException) {
-        println("Caught ArithmeticException")
-    }
+  val deferred = GlobalScope.async {
+    delay(3000) // root coroutine with async
+    println("Throwing exception from async")
+    throw ArithmeticException() // Nothing is printed, relying on user to call await
+  }
+  try {
+    deferred.await()
+    println("Unreached")
+  } catch (e: ArithmeticException) {
+    println("Caught ArithmeticException")
+  }
 }

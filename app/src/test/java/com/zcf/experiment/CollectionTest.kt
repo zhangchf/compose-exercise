@@ -1,49 +1,42 @@
 package com.zcf.experiment
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.TestScope
-import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Test
-import kotlin.coroutines.CoroutineContext
 
 class CollectionTest {
 
-    @Test
-    fun `map doesn't operate sequentially`() {
-        var mapCount = 0
-        var firstOrNullCount = 0
-        (1..10)
-            .map {
-                mapCount++
-                println("map: $it")
-                it
-            }
-            .firstOrNull {
-                firstOrNullCount++
-                println("firstOrNull: $it")
-                it == 3
-            }
+  @Test
+  fun `map doesn't operate sequentially`() {
+    var mapCount = 0
+    var firstOrNullCount = 0
+    (1..10)
+      .map {
+        mapCount++
+        println("map: $it")
+        it
+      }
+      .firstOrNull {
+        firstOrNullCount++
+        println("firstOrNull: $it")
+        it == 3
+      }
 
-        Assert.assertEquals(mapCount, 10)
-        Assert.assertEquals(firstOrNullCount, 3)
-    }
+    Assert.assertEquals(mapCount, 10)
+    Assert.assertEquals(firstOrNullCount, 3)
+  }
 
-    @Test
-    fun `forEach doesn't operate sequentially`() {
-        var forEachCount = 0
-        (1..10)
-            .forEach {
-                forEachCount++
-                println("forEach: $it")
-                if (it == 3) return@forEach
-            }
+  @Test
+  fun `forEach doesn't operate sequentially`() {
+    var forEachCount = 0
+    (1..10)
+      .forEach {
+        forEachCount++
+        println("forEach: $it")
+        if (it == 3) return@forEach
+      }
 
-        Assert.assertEquals(forEachCount, 10)
-    }
+    Assert.assertEquals(forEachCount, 10)
+  }
 }

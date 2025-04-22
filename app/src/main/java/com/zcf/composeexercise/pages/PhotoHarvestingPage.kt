@@ -6,12 +6,11 @@ import com.zcf.composeexercise.photoharvesting.PhotoHarvestingHostView
 
 @Composable
 fun PhotoHarvestingPage() {
-    PhotoHarvestingHostView(
-        onPictureCaptured = { imageCaptureType: ImageCaptureType, bytes: ByteArray ->
-
-        },
-        onBarcodeCaptured = {},
-        onSeeExamples = {},
-        onClose = {}
-    )
+  PhotoHarvestingHostView(
+    onPictureCaptured = { imageCaptureType: ImageCaptureType, bytes: ByteArray ->
+    },
+    onBarcodeCaptured = {},
+    onSeeExamples = {},
+    onClose = {}
+  )
 }

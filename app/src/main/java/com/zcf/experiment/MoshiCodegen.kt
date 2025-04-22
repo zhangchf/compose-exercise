@@ -7,15 +7,15 @@ import com.squareup.moshi.JsonClass
  */
 @JsonClass(generateAdapter = true)
 data class Model1(
-    val name: String,
-    val age: Int
+  val name: String,
+  val age: Int
 )
 
 @JsonClass(generateAdapter = true)
 data class Model2(
-    val name: String,
-    val age: Int,
-    val isValid: Boolean? = false,
-    val newStringField: String = "",
-    val newDoubleField: Double = 0.0
+  val name: String,
+  val age: Int,
+  val isValid: Boolean? = false,
+  val newStringField: String = "",
+  val newDoubleField: Double = 0.0
 )

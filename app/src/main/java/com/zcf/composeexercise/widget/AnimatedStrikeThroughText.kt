@@ -22,51 +22,51 @@ import androidx.compose.ui.text.style.TextDecoration
 
 @Composable
 fun AnimatedStrikethroughText(
-    text: String,
-    modifier: Modifier = Modifier,
-    isVisible: Boolean = true,
-    animateOnHide: Boolean = true,
-    spec: AnimationSpec<Int> = tween(text.length * 30, easing = FastOutLinearInEasing),
-    strikethroughStyle: SpanStyle = SpanStyle(),
-    textStyle: TextStyle = LocalTextStyle.current
+  text: String,
+  modifier: Modifier = Modifier,
+  isVisible: Boolean = true,
+  animateOnHide: Boolean = true,
+  spec: AnimationSpec<Int> = tween(text.length * 30, easing = FastOutLinearInEasing),
+  strikethroughStyle: SpanStyle = SpanStyle(),
+  textStyle: TextStyle = LocalTextStyle.current
 ) {
-    var textToDisplay by remember { mutableStateOf(AnnotatedString("")) }
+  var textToDisplay by remember { mutableStateOf(AnnotatedString("")) }
 
-    val length = remember { Animatable(initialValue = 0, typeConverter = Int.VectorConverter) }
+  val length = remember { Animatable(initialValue = 0, typeConverter = Int.VectorConverter) }
 
-    LaunchedEffect(length.value) {
+  LaunchedEffect(length.value) {
+    textToDisplay = text.buildStrikethrough(length.value, strikethroughStyle)
+  }
+
+  LaunchedEffect(isVisible) {
+    when {
+      isVisible -> length.animateTo(text.length, spec)
+      !isVisible && animateOnHide -> length.animateTo(0, spec)
+      else -> length.snapTo(0)
+    }
+  }
+
+  LaunchedEffect(text) {
+    when {
+      isVisible && text.length == length.value -> {
         textToDisplay = text.buildStrikethrough(length.value, strikethroughStyle)
+      }
+      isVisible && text.length != length.value -> {
+        length.snapTo(text.length)
+      }
+      else -> textToDisplay = AnnotatedString(text)
     }
+  }
 
-    LaunchedEffect(isVisible) {
-        when {
-            isVisible -> length.animateTo(text.length, spec)
-            !isVisible && animateOnHide -> length.animateTo(0, spec)
-            else -> length.snapTo(0)
-        }
-    }
-
-    LaunchedEffect(text) {
-        when {
-            isVisible && text.length == length.value -> {
-                textToDisplay = text.buildStrikethrough(length.value, strikethroughStyle)
-            }
-            isVisible && text.length != length.value -> {
-                length.snapTo(text.length)
-            }
-            else -> textToDisplay = AnnotatedString(text)
-        }
-    }
-
-    Text(
-        text = textToDisplay,
-        modifier = modifier,
-        style = textStyle
-    )
+  Text(
+    text = textToDisplay,
+    modifier = modifier,
+    style = textStyle
+  )
 }
 
 private fun String.buildStrikethrough(length: Int, style: SpanStyle) = buildAnnotatedString {
-    append(this@buildStrikethrough)
-    val lineThroughStyle = style.copy(textDecoration = TextDecoration.LineThrough)
-    addStyle(lineThroughStyle, 0, length)
+  append(this@buildStrikethrough)
+  val lineThroughStyle = style.copy(textDecoration = TextDecoration.LineThrough)
+  addStyle(lineThroughStyle, 0, length)
 }

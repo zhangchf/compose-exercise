@@ -38,290 +38,290 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun AnimatedBottomSheetDialogPage() {
-    val scope = rememberCoroutineScope()
-    val snackbarHostState = remember { SnackbarHostState() }
+  val scope = rememberCoroutineScope()
+  val snackbarHostState = remember { SnackbarHostState() }
 
-    var showAnimatedTransitionDialog by remember { mutableStateOf(false) }
-    var showAnimatedTransitionDialogWithCallback by remember { mutableStateOf(false) }
-    var showCustomAnimationDialog by remember { mutableStateOf(false) }
-    var showCustomAnimationDialogBottomSheet by remember { mutableStateOf(false) }
-    var showCustomAnimationDialogDraggable by remember { mutableStateOf(false) }
-    var showAliasModalBottomSheet by remember { mutableStateOf(false) }
-    var showAliasModalBottomSheetDraggable by remember { mutableStateOf(false) }
+  var showAnimatedTransitionDialog by remember { mutableStateOf(false) }
+  var showAnimatedTransitionDialogWithCallback by remember { mutableStateOf(false) }
+  var showCustomAnimationDialog by remember { mutableStateOf(false) }
+  var showCustomAnimationDialogBottomSheet by remember { mutableStateOf(false) }
+  var showCustomAnimationDialogDraggable by remember { mutableStateOf(false) }
+  var showAliasModalBottomSheet by remember { mutableStateOf(false) }
+  var showAliasModalBottomSheetDraggable by remember { mutableStateOf(false) }
 
-    // AnimatedDialog by kappdev
-    var showAnimateDialogByKappdev by remember { mutableStateOf(false) }
+  // AnimatedDialog by kappdev
+  var showAnimateDialogByKappdev by remember { mutableStateOf(false) }
 
-    Column(modifier = Modifier.fillMaxSize()) {
-        Button(onClick = {
-            showAnimatedTransitionDialog = true
-        }) {
-            Text(text = "Show animated transition dialog")
+  Column(modifier = Modifier.fillMaxSize()) {
+    Button(onClick = {
+      showAnimatedTransitionDialog = true
+    }) {
+      Text(text = "Show animated transition dialog")
+    }
+
+    Button(onClick = {
+      showAnimatedTransitionDialogWithCallback = true
+    }) {
+      Text(text = "Show animated transition dialog with callback")
+    }
+
+    Button(onClick = {
+      showCustomAnimationDialog = true
+    }) {
+      Text(text = "Custom animation dialog")
+    }
+
+    Button(onClick = {
+      showCustomAnimationDialogBottomSheet = true
+    }) {
+      Text(text = "Custom animation dialog (Simplified bottom sheet)")
+    }
+
+    Button(onClick = {
+      showCustomAnimationDialogDraggable = true
+    }) {
+      Text(text = "Custom animation dialog (Draggable) ✓")
+    }
+
+    Button(onClick = {
+      showAliasModalBottomSheet = true
+    }) {
+      Text(text = "Material3 ModalBottomSheet")
+    }
+
+    Button(onClick = {
+      showAliasModalBottomSheetDraggable = true
+    }) {
+      Text(text = "Material3 ModalBottomSheet (Draggable)")
+    }
+
+    Button(onClick = {
+      showAnimateDialogByKappdev = true
+    }) {
+      Text(text = "AnimatedDialog by Kappdev")
+    }
+
+    Spacer(modifier = Modifier.weight(1f))
+    SnackbarHost(
+      hostState = snackbarHostState
+    )
+  }
+
+  fun onPositiveButton() {
+    scope.launch {
+      println("zcf positive button clicked")
+      snackbarHostState.showSnackbar("Positive button clicked")
+    }
+  }
+
+  fun onNegativeButton() {
+    scope.launch {
+      snackbarHostState.showSnackbar("Negative button clicked")
+    }
+  }
+
+  if (showAnimatedTransitionDialog) {
+    AnimatedTransitionDialog(
+      onDismissRequest = {
+        showAnimatedTransitionDialog = false
+      },
+      enter = slideInVertically(animationSpec = tween(ANIMATION_DURATION)) { it },
+      exit = slideOutVertically(animationSpec = tween(ANIMATION_DURATION)) { it },
+      animationDuration = ANIMATION_DURATION
+    ) { animatedTransitionDialogHelper ->
+      DialogContent(
+        onPositiveButton = {
+          animatedTransitionDialogHelper.triggerAnimatedDismiss()
+          onPositiveButton()
+        },
+        onNegativeButton = {
+          animatedTransitionDialogHelper.triggerAnimatedDismiss()
+          onNegativeButton()
         }
+      )
+    }
+  }
 
-        Button(onClick = {
-            showAnimatedTransitionDialogWithCallback = true
-        }) {
-            Text(text = "Show animated transition dialog with callback")
+  if (showAnimatedTransitionDialogWithCallback) {
+    AnimatedTransitionDialogWithCallback(
+      onDismissRequest = {
+        showAnimatedTransitionDialogWithCallback = false
+      },
+      enter = slideInVertically(animationSpec = tween(ANIMATION_DURATION)) { it },
+      exit = slideOutVertically(animationSpec = tween(ANIMATION_DURATION)) { it },
+      animationDuration = ANIMATION_DURATION
+    ) { dismissCallback ->
+      DialogContent(
+        onPositiveButton = {
+          scope.launch { dismissCallback() }
+            .invokeOnCompletion { onPositiveButton() }
+        },
+        onNegativeButton = {
+          scope.launch { dismissCallback() }
+            .invokeOnCompletion { onNegativeButton() }
         }
+      )
+    }
+  }
 
-        Button(onClick = {
-            showCustomAnimationDialog = true
-        }) {
-            Text(text = "Custom animation dialog")
-        }
+  CustomAnimationDialog(
+    showDialog = showCustomAnimationDialog,
+    onDismissRequest = { showCustomAnimationDialog = false }
+  ) {
+    DialogContent(
+      onPositiveButton = { showCustomAnimationDialog = false },
+      onNegativeButton = { showCustomAnimationDialog = false }
+    )
+  }
 
-        Button(onClick = {
-            showCustomAnimationDialogBottomSheet = true
-        }) {
-            Text(text = "Custom animation dialog (Simplified bottom sheet)")
-        }
+  CustomAnimationDialog_BottomSheet(
+    showDialog = showCustomAnimationDialogBottomSheet,
+    onDismissRequest = { showCustomAnimationDialogBottomSheet = false }
+  ) {
+    DialogContent(
+      onPositiveButton = {
+        showCustomAnimationDialogBottomSheet = false
+        onPositiveButton()
+      },
+      onNegativeButton = {
+        showCustomAnimationDialogBottomSheet = false
+        onNegativeButton()
+      }
+    )
+  }
 
-        Button(onClick = {
-            showCustomAnimationDialogDraggable = true
-        }) {
-            Text(text = "Custom animation dialog (Draggable) ✓")
-        }
+  CustomAnimationDialog_Draggable(
+    showDialog = showCustomAnimationDialogDraggable,
+    onDismissRequest = { showCustomAnimationDialogDraggable = false },
+    isCancellable = true
+  ) {
+    DialogContent(
+      onPositiveButton = {
+        showCustomAnimationDialogDraggable = false
+        onPositiveButton()
+      },
+      onNegativeButton = {
+        showCustomAnimationDialogDraggable = false
+        onNegativeButton()
+      }
+    )
+  }
 
-        Button(onClick = {
-            showAliasModalBottomSheet = true
-        }) {
-            Text(text = "Material3 ModalBottomSheet")
+  if (showAliasModalBottomSheet) {
+    AliasModalBottomSheet(
+      onDismissRequest = { showAliasModalBottomSheet = false },
+      isExpandedByDefault = true,
+      isCancelable = false
+    ) { dismissCallback ->
+      DialogContent(
+        onPositiveButton = {
+          scope.launch {
+            dismissCallback()
+            onPositiveButton()
+          }
+        },
+        onNegativeButton = {
+          scope.launch {
+            dismissCallback()
+            onNegativeButton()
+          }
         }
+      )
+    }
+  }
 
-        Button(onClick = {
-            showAliasModalBottomSheetDraggable = true
-        }) {
-            Text(text = "Material3 ModalBottomSheet (Draggable)")
+  if (showAliasModalBottomSheetDraggable) {
+    AliasModalBottomSheet(
+      onDismissRequest = { showAliasModalBottomSheetDraggable = false },
+      isExpandedByDefault = true,
+      isCancelable = true
+    ) { dismissCallback ->
+      DialogContent(
+        onPositiveButton = {
+          scope.launch {
+            dismissCallback()
+            onPositiveButton()
+          }
+        },
+        onNegativeButton = {
+          scope.launch {
+            dismissCallback()
+            onNegativeButton()
+          }
         }
-        
-        Button(onClick = {
-            showAnimateDialogByKappdev = true
-        }) {
-            Text(text = "AnimatedDialog by Kappdev")
-        }
+      )
+    }
+  }
 
-        Spacer(modifier = Modifier.weight(1f))
-        SnackbarHost(
-            hostState = snackbarHostState
+  if (showAnimateDialogByKappdev) {
+    AnimatedDialog(
+      onDismiss = { showAnimateDialogByKappdev = false }
+    ) { triggerDismiss ->
+      Column(
+        modifier = Modifier
+          .fillMaxWidth()
+          .background(
+            color = MaterialTheme.colors.surface,
+            shape = RoundedCornerShape(24.dp)
+          )
+          .padding(16.dp)
+      ) {
+        Text(
+          text = "👏 Clap Alert Dialog",
+          color = MaterialTheme.colors.contentColorFor(MaterialTheme.colors.surface),
+          style = MaterialTheme.typography.h1
         )
-    }
 
-    fun onPositiveButton() {
-        scope.launch {
-            println("zcf positive button clicked")
-            snackbarHostState.showSnackbar("Positive button clicked")
-        }
-    }
+        Spacer(Modifier.height(8.dp))
 
-    fun onNegativeButton() {
-        scope.launch {
-            snackbarHostState.showSnackbar("Negative button clicked")
-        }
-    }
-
-    if (showAnimatedTransitionDialog) {
-        AnimatedTransitionDialog(
-            onDismissRequest = {
-                showAnimatedTransitionDialog = false
-            },
-            enter = slideInVertically(animationSpec = tween(ANIMATION_DURATION)) { it },
-            exit = slideOutVertically(animationSpec = tween(ANIMATION_DURATION)) { it },
-            animationDuration = ANIMATION_DURATION
-        ) { animatedTransitionDialogHelper ->
-            DialogContent(
-                onPositiveButton = {
-                    animatedTransitionDialogHelper.triggerAnimatedDismiss()
-                    onPositiveButton()
-                },
-                onNegativeButton = {
-                    animatedTransitionDialogHelper.triggerAnimatedDismiss()
-                    onNegativeButton()
-                }
-            )
-        }
-    }
-
-    if (showAnimatedTransitionDialogWithCallback) {
-        AnimatedTransitionDialogWithCallback(
-            onDismissRequest = {
-                showAnimatedTransitionDialogWithCallback = false
-            },
-            enter = slideInVertically(animationSpec = tween(ANIMATION_DURATION)) { it },
-            exit = slideOutVertically(animationSpec = tween(ANIMATION_DURATION)) { it },
-            animationDuration = ANIMATION_DURATION
-        ) { dismissCallback ->
-            DialogContent(
-                onPositiveButton = {
-                    scope.launch { dismissCallback() }
-                        .invokeOnCompletion { onPositiveButton() }
-                },
-                onNegativeButton = {
-                    scope.launch { dismissCallback() }
-                        .invokeOnCompletion { onNegativeButton() }
-                }
-            )
-        }
-    }
-
-    CustomAnimationDialog(
-        showDialog = showCustomAnimationDialog,
-        onDismissRequest = { showCustomAnimationDialog = false }
-    ) {
-        DialogContent(
-            onPositiveButton = { showCustomAnimationDialog = false },
-            onNegativeButton = { showCustomAnimationDialog = false }
+        Text(
+          text = "Please show your appreciation by hitting the clap button.",
+          color = MaterialTheme.colors.contentColorFor(MaterialTheme.colors.surface),
+          style = MaterialTheme.typography.body1
         )
-    }
 
-    CustomAnimationDialog_BottomSheet(
-        showDialog = showCustomAnimationDialogBottomSheet,
-        onDismissRequest = { showCustomAnimationDialogBottomSheet = false },
-    ) {
-        DialogContent(
-            onPositiveButton = {
-                showCustomAnimationDialogBottomSheet = false
-                onPositiveButton()
-            },
-            onNegativeButton = {
-                showCustomAnimationDialogBottomSheet = false
-                onNegativeButton()
-            }
-        )
-    }
+        Spacer(Modifier.height(16.dp))
 
-    CustomAnimationDialog_Draggable(
-        showDialog = showCustomAnimationDialogDraggable,
-        onDismissRequest = { showCustomAnimationDialogDraggable = false },
-        isCancellable = true
-    ) {
-        DialogContent(
-            onPositiveButton = {
-                showCustomAnimationDialogDraggable = false
-                onPositiveButton()
-            },
-            onNegativeButton = {
-                showCustomAnimationDialogDraggable = false
-                onNegativeButton()
-            }
-        )
-    }
-
-    if (showAliasModalBottomSheet) {
-        AliasModalBottomSheet(
-            onDismissRequest = { showAliasModalBottomSheet = false },
-            isExpandedByDefault = true,
-            isCancelable = false
-        ) { dismissCallback ->
-            DialogContent(
-                onPositiveButton = {
-                    scope.launch {
-                        dismissCallback()
-                        onPositiveButton()
-                    }
-                },
-                onNegativeButton = {
-                    scope.launch {
-                        dismissCallback()
-                        onNegativeButton()
-                    }
-                }
-            )
+        Button(
+          onClick = triggerDismiss,
+          modifier = Modifier.align(Alignment.End)
+        ) {
+          Text("Clap")
         }
+      }
     }
-
-    if (showAliasModalBottomSheetDraggable) {
-        AliasModalBottomSheet(
-            onDismissRequest = { showAliasModalBottomSheetDraggable = false },
-            isExpandedByDefault = true,
-            isCancelable = true
-        ) { dismissCallback ->
-            DialogContent(
-                onPositiveButton = {
-                    scope.launch {
-                        dismissCallback()
-                        onPositiveButton()
-                    }
-                },
-                onNegativeButton = {
-                    scope.launch {
-                        dismissCallback()
-                        onNegativeButton()
-                    }
-                }
-            )
-        }
-    }
-    
-    if (showAnimateDialogByKappdev) {
-        AnimatedDialog(
-            onDismiss = { showAnimateDialogByKappdev = false }
-        ) { triggerDismiss ->
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        color = MaterialTheme.colors.surface,
-                        shape = RoundedCornerShape(24.dp)
-                    )
-                    .padding(16.dp)
-            ) {
-                Text(
-                    text = "👏 Clap Alert Dialog",
-                    color = MaterialTheme.colors.contentColorFor(MaterialTheme.colors.surface),
-                    style = MaterialTheme.typography.h1
-                )
-
-                Spacer(Modifier.height(8.dp))
-
-                Text(
-                    text = "Please show your appreciation by hitting the clap button.",
-                    color = MaterialTheme.colors.contentColorFor(MaterialTheme.colors.surface),
-                    style = MaterialTheme.typography.body1
-                )
-
-                Spacer(Modifier.height(16.dp))
-
-                Button(
-                    onClick = triggerDismiss,
-                    modifier = Modifier.align(Alignment.End)
-                ) {
-                    Text("Clap")
-                }
-            }
-        }
-    }
+  }
 }
 
 @Composable
 fun DialogContent(
-    onPositiveButton: () -> Unit,
-    onNegativeButton: () -> Unit
+  onPositiveButton: () -> Unit,
+  onNegativeButton: () -> Unit
 ) {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Spacer(modifier = Modifier.height(32.dp))
-        Text(text = "Dialog title")
+  Column(
+    modifier = Modifier.fillMaxWidth(),
+    horizontalAlignment = Alignment.CenterHorizontally
+  ) {
+    Spacer(modifier = Modifier.height(32.dp))
+    Text(text = "Dialog title")
 
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(text = "Dialog Content")
+    Spacer(modifier = Modifier.height(16.dp))
+    Text(text = "Dialog Content")
 
-        Spacer(modifier = Modifier.height(32.dp))
-        Button(onClick = {
-            onPositiveButton()
-        }) {
-            Text(text = "OK")
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = {
-            onNegativeButton()
-        }) {
-            Text(text = "Close")
-        }
-
-        Spacer(modifier = Modifier.height(32.dp))
+    Spacer(modifier = Modifier.height(32.dp))
+    Button(onClick = {
+      onPositiveButton()
+    }) {
+      Text(text = "OK")
     }
+
+    Spacer(modifier = Modifier.height(16.dp))
+    Button(onClick = {
+      onNegativeButton()
+    }) {
+      Text(text = "Close")
+    }
+
+    Spacer(modifier = Modifier.height(32.dp))
+  }
 }

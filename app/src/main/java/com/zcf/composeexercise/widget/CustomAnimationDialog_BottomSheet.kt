@@ -1,6 +1,5 @@
 package com.zcf.composeexercise.widget
 
-import android.view.View
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
@@ -32,7 +31,6 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import androidx.compose.ui.window.DialogWindowProvider
 
 /**
  * Reference: https://www.sinasamaki.com/custom-dialog-animation-in-jetpack-compose/
@@ -40,74 +38,74 @@ import androidx.compose.ui.window.DialogWindowProvider
  */
 @Composable
 fun CustomAnimationDialog_BottomSheet(
-    showDialog: Boolean,
-    onDismissRequest: () -> Unit,
-    enter: EnterTransition = slideInVertically { it },
-    exit: ExitTransition = slideOutVertically { it },
-    content: @Composable () -> Unit
+  showDialog: Boolean,
+  onDismissRequest: () -> Unit,
+  enter: EnterTransition = slideInVertically { it },
+  exit: ExitTransition = slideOutVertically { it },
+  content: @Composable () -> Unit
 ) {
-    var showAnimatedDialog by remember { mutableStateOf(false) }
+  var showAnimatedDialog by remember { mutableStateOf(false) }
 
-    LaunchedEffect(showDialog) {
-        if (showDialog) showAnimatedDialog = true
-    }
+  LaunchedEffect(showDialog) {
+    if (showDialog) showAnimatedDialog = true
+  }
 
-    if (showAnimatedDialog) {
-        Dialog(
-            onDismissRequest = onDismissRequest,
-            properties = DialogProperties(usePlatformDefaultWidth = false)
+  if (showAnimatedDialog) {
+    Dialog(
+      onDismissRequest = onDismissRequest,
+      properties = DialogProperties(usePlatformDefaultWidth = false)
+    ) {
+      findDialogWindowProviderInParent(LocalView.current)?.window?.let { window ->
+        window.setWindowAnimations(-1)
+        window.setDimAmount(0f)
+      }
+
+      var animateIn by remember { mutableStateOf(false) }
+      LaunchedEffect(Unit) { animateIn = true }
+
+      AnimatedVisibility(
+        visible = animateIn && showDialog,
+        enter = fadeIn(),
+        exit = fadeOut()
+      ) {
+        Box(
+          modifier = Modifier
+            .fillMaxSize()
+            .pointerInput(Unit) { detectTapGestures { onDismissRequest() } }
+            .background(Color.Black.copy(alpha = 0.56f))
+            .fillMaxSize()
+        )
+      }
+
+      Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.BottomCenter
+      ) {
+        AnimatedVisibility(
+          visible = animateIn && showDialog,
+          enter = enter,
+          exit = exit
         ) {
-            findDialogWindowProviderInParent(LocalView.current)?.window?.let { window ->
-                window.setWindowAnimations(-1)
-                window.setDimAmount(0f)
+          val roundedShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
+          Box(
+            modifier = Modifier
+              .pointerInput(Unit) { detectTapGestures { } }
+              .shadow(8.dp, shape = roundedShape)
+              .fillMaxWidth()
+              .clip(roundedShape)
+              .background(MaterialTheme.colors.surface),
+            contentAlignment = Alignment.BottomCenter
+          ) {
+            content()
+          }
+
+          DisposableEffect(key1 = Unit) {
+            onDispose {
+              showAnimatedDialog = false
             }
-
-            var animateIn by remember { mutableStateOf(false) }
-            LaunchedEffect(Unit) { animateIn = true }
-
-            AnimatedVisibility(
-                visible = animateIn && showDialog,
-                enter = fadeIn(),
-                exit = fadeOut()
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .pointerInput(Unit) { detectTapGestures { onDismissRequest() } }
-                        .background(Color.Black.copy(alpha = 0.56f))
-                        .fillMaxSize()
-                )
-            }
-
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.BottomCenter
-            ) {
-                AnimatedVisibility(
-                    visible = animateIn && showDialog,
-                    enter = enter,
-                    exit = exit
-                ) {
-                    val roundedShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
-                    Box(
-                        modifier = Modifier
-                            .pointerInput(Unit) { detectTapGestures { } }
-                            .shadow(8.dp, shape = roundedShape)
-                            .fillMaxWidth()
-                            .clip(roundedShape)
-                            .background(MaterialTheme.colors.surface),
-                        contentAlignment = Alignment.BottomCenter
-                    ) {
-                        content()
-                    }
-
-                    DisposableEffect(key1 = Unit) {
-                        onDispose {
-                            showAnimatedDialog = false
-                        }
-                    }
-                }
-            }
+          }
         }
+      }
     }
+  }
 }

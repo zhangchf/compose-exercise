@@ -9,18 +9,18 @@ import androidx.compose.runtime.CompositionLocalProvider
 
 @Composable
 fun CompositionLocalPage() {
-    Column {
-        TestText("Default alpha")
-        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-            Text("Medium alpha")
-            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
-                TestText(text = "Disabled alpha")
-            }
-        }
+  Column {
+    TestText("Default alpha")
+    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+      Text("Medium alpha")
+      CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
+        TestText(text = "Disabled alpha")
+      }
     }
+  }
 }
 
 @Composable
 fun TestText(text: String) {
-    Text(text)
+  Text(text)
 }

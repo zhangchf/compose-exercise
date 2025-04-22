@@ -21,7 +21,6 @@ import com.zcf.composeexercise.MainScreenRoutes
 import com.zcf.composeexercise.todos.BottomNavScreen.*
 import com.zcf.composeexercise.todos.viewmodel.TodosViewModel
 
-
 sealed class BottomNavScreen(val title: String, val icon: ImageVector, val route: String) {
   object TextFieldPage : BottomNavScreen("TextField", Icons.Filled.Person, MainScreenRoutes.StatesPage.key)
   object SnackBarPage : BottomNavScreen("SnackBar", Icons.Filled.Call, MainScreenRoutes.SideEffectsPage.key)
@@ -29,7 +28,9 @@ sealed class BottomNavScreen(val title: String, val icon: ImageVector, val route
 }
 
 val BOTTOM_NAV_ITEMS = listOf(
-  TextFieldPage, SnackBarPage, CanvasPage
+  TextFieldPage,
+  SnackBarPage,
+  CanvasPage
 )
 
 @Composable
@@ -54,10 +55,7 @@ fun TodosListView(
         modifier = Modifier.clip(RoundedCornerShape(8.dp, 8.dp)),
         cutoutShape = CircleShape
       ) {
-
-        BottomNavigation(
-        ) {
-
+        BottomNavigation() {
           BOTTOM_NAV_ITEMS.forEach { screen ->
             BottomNavigationItem(
               selected = false,
@@ -79,7 +77,7 @@ fun TodosListView(
       }
     },
     floatingActionButton = {
-      FloatingActionButton(onClick = {  }) {
+      FloatingActionButton(onClick = { }) {
         Icon(imageVector = Icons.Default.Create, contentDescription = "Create")
       }
     },
@@ -126,12 +124,10 @@ fun TodosListView(
 
             Divider()
           }
-
         }
       }
     } else {
       Text(text = errorMsg)
     }
   }
-
 }

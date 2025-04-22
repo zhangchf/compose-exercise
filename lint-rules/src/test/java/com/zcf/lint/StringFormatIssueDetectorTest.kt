@@ -5,180 +5,180 @@ import com.android.tools.lint.checks.infrastructure.LintDetectorTest
 const val dollar = "$"
 
 class StringFormatIssueDetectorTest : LintDetectorTest() {
-    override fun getDetector() = StringFormatIssueDetector()
+  override fun getDetector() = StringFormatIssueDetector()
 
-    override fun getIssues() = StringFormatIssueDetector.getIssues()
+  override fun getIssues() = StringFormatIssueDetector.getIssues()
 
-    fun testNoErrorWhenCheckStringsWithNoArguments() {
-        val stubFileEN = xml(
-            "res/values/strings.xml",
-            """
+  fun testNoErrorWhenCheckStringsWithNoArguments() {
+    val stubFileEN = xml(
+      "res/values/strings.xml",
+      """
             <resources>
               <string name="key1">EN string 1</string>
               <string name="key2">EN string 2</string>
             </resources>
-            """.trimIndent()
-        )
-        val stubFileCN = xml(
-            "res/values-zh/strings.xml",
-            """
+      """.trimIndent()
+    )
+    val stubFileCN = xml(
+      "res/values-zh/strings.xml",
+      """
             <resources>
               <string name="key1">CN string 1</string>
               <string name="key2">CN string 2</string>
             </resources>
-            """.trimIndent()
-        )
+      """.trimIndent()
+    )
 
-        lint()
-            .files(stubFileEN, stubFileCN)
-            .run()
-            .expectClean()
-    }
+    lint()
+      .files(stubFileEN, stubFileCN)
+      .run()
+      .expectClean()
+  }
 
-    fun testNoErrorWhenStringsHaveCorrectPlaceholders() {
-        val stubFileEN = xml(
-            "res/values/strings.xml",
-            """
+  fun testNoErrorWhenStringsHaveCorrectPlaceholders() {
+    val stubFileEN = xml(
+      "res/values/strings.xml",
+      """
             <resources>
               <string name="key1">EN string %1${dollar}s xxx %1${dollar}d xxx</string>
               <string name="key2">EN string %1${dollar}d yyy %1${dollar}s yyy</string>
             </resources>
-            """.trimIndent()
-        )
-        val stubFileCN = xml(
-            "res/values-zh/strings.xml",
-            """
+      """.trimIndent()
+    )
+    val stubFileCN = xml(
+      "res/values-zh/strings.xml",
+      """
             <resources>
               <string name="key1">CN string %1${dollar}s xxx %1${dollar}d xxx</string>
               <string name="key2">CN string %1${dollar}d yyy %1${dollar}s yyy</string>
             </resources>
-            """.trimIndent()
-        )
+      """.trimIndent()
+    )
 
-        lint()
-            .files(stubFileEN, stubFileCN)
-            .run()
-            .expectClean()
-    }
+    lint()
+      .files(stubFileEN, stubFileCN)
+      .run()
+      .expectClean()
+  }
 
-    fun testOrdersOfPlaceholderDoNotMatter() {
-        val stubFileEN = xml(
-            "res/values/strings.xml",
-            """
+  fun testOrdersOfPlaceholderDoNotMatter() {
+    val stubFileEN = xml(
+      "res/values/strings.xml",
+      """
             <resources>
               <string name="key1">EN string %1${dollar}s xxx %1${dollar}d xxx</string>
             </resources>
-            """.trimIndent()
-        )
-        val stubFileCN = xml(
-            "res/values-zh/strings.xml",
-            """
+      """.trimIndent()
+    )
+    val stubFileCN = xml(
+      "res/values-zh/strings.xml",
+      """
             <resources>
               <string name="key1">CN string %1${dollar}d xxx %1${dollar}s xxx</string>
             </resources>
-            """.trimIndent()
-        )
+      """.trimIndent()
+    )
 
-        lint()
-            .files(stubFileEN, stubFileCN)
-            .run()
-            .expectClean()
-    }
+    lint()
+      .files(stubFileEN, stubFileCN)
+      .run()
+      .expectClean()
+  }
 
-    fun testErrorWhenPlaceholdersDoNotMatch() {
-        val stubFileEN = xml(
-            "res/values/strings.xml",
-            """
+  fun testErrorWhenPlaceholdersDoNotMatch() {
+    val stubFileEN = xml(
+      "res/values/strings.xml",
+      """
             <resources>
               <string name="key1">EN string %1${dollar}s xxx %1${dollar}d xxx</string>
             </resources>
-            """.trimIndent()
-        )
-        val stubFileCN = xml(
-            "res/values-zh/strings.xml",
-            """
+      """.trimIndent()
+    )
+    val stubFileCN = xml(
+      "res/values-zh/strings.xml",
+      """
             <resources>
               <string name="key1">CN string %1${dollar}d xxx %1${dollar}d xxx</string>
             </resources>
-            """.trimIndent()
-        )
+      """.trimIndent()
+    )
 
-        lint()
-            .files(stubFileEN, stubFileCN)
-            .run()
-            .expectErrorCount(1)
-    }
+    lint()
+      .files(stubFileEN, stubFileCN)
+      .run()
+      .expectErrorCount(1)
+  }
 
-    fun testErrorWhenPlaceholdersCountDifferent() {
-        val stubFileEN = xml(
-            "res/values/strings.xml",
-            """
+  fun testErrorWhenPlaceholdersCountDifferent() {
+    val stubFileEN = xml(
+      "res/values/strings.xml",
+      """
             <resources>
               <string name="key1">EN string %1${dollar}s xxx %1${dollar}d xxx</string>
             </resources>
-            """.trimIndent()
-        )
-        val stubFileCN = xml(
-            "res/values-zh/strings.xml",
-            """
+      """.trimIndent()
+    )
+    val stubFileCN = xml(
+      "res/values-zh/strings.xml",
+      """
             <resources>
               <string name="key1">CN string %1${dollar}d xxx xxx</string>
             </resources>
-            """.trimIndent()
-        )
+      """.trimIndent()
+    )
 
-        lint()
-            .files(stubFileEN, stubFileCN)
-            .run()
-            .expectErrorCount(1)
-    }
+    lint()
+      .files(stubFileEN, stubFileCN)
+      .run()
+      .expectErrorCount(1)
+  }
 
-    fun testErrorWhenEnHaveNoPlaceholderButOthersHave() {
-        val stubFileEN = xml(
-            "res/values/strings.xml",
-            """
+  fun testErrorWhenEnHaveNoPlaceholderButOthersHave() {
+    val stubFileEN = xml(
+      "res/values/strings.xml",
+      """
             <resources>
               <string name="key1">EN string xxx xxx</string>
             </resources>
-            """.trimIndent()
-        )
-        val stubFileCN = xml(
-            "res/values-zh/strings.xml",
-            """
+      """.trimIndent()
+    )
+    val stubFileCN = xml(
+      "res/values-zh/strings.xml",
+      """
             <resources>
               <string name="key1">CN string %1${dollar}d xxx xxx</string>
             </resources>
-            """.trimIndent()
-        )
+      """.trimIndent()
+    )
 
-        lint()
-            .files(stubFileEN, stubFileCN)
-            .run()
-            .expectErrorCount(1)
-    }
+    lint()
+      .files(stubFileEN, stubFileCN)
+      .run()
+      .expectErrorCount(1)
+  }
 
-    fun testNoErrorWhenOnlyEnglish() {
-        val stubFileEN = xml(
-            "res/values/strings.xml",
-            """
+  fun testNoErrorWhenOnlyEnglish() {
+    val stubFileEN = xml(
+      "res/values/strings.xml",
+      """
             <resources>
               <string name="key1">EN string %1${dollar}s xxx xxx</string>
               <string name="key2">EN string %1${dollar}d yyy %1${dollar}s yyy</string>
             </resources>
-            """.trimIndent()
-        )
+      """.trimIndent()
+    )
 
-        val stubFileCN = xml(
-            "res/values-zh/strings.xml",
-            """
+    val stubFileCN = xml(
+      "res/values-zh/strings.xml",
+      """
             <resources>
             </resources>
-            """.trimIndent()
-        )
+      """.trimIndent()
+    )
 
-        lint()
-            .files(stubFileEN, stubFileCN)
-            .run()
-            .expectClean()
-    }
+    lint()
+      .files(stubFileEN, stubFileCN)
+      .run()
+      .expectClean()
+  }
 }

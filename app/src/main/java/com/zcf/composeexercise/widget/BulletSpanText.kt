@@ -8,10 +8,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.ParagraphStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.style.TextIndent
-import androidx.compose.ui.unit.sp
 
 /**
  * A clickable text with 1-2 clickable spans.

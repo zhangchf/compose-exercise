@@ -18,9 +18,9 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.zcf.composeexercise.R
 import com.zcf.composeexercise.ui.theme.Appearance.MEDIUM
 import com.zcf.composeexercise.ui.theme.Appearance.REGULAR
-import com.zcf.composeexercise.R
 import com.zcf.composeexercise.ui.theme.Colors.gray3Solid
 
 object TextStyles {

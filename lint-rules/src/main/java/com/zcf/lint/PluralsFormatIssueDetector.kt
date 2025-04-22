@@ -98,7 +98,8 @@ class PluralsFormatIssueDetector : ResourceXmlDetector(), SourceCodeScanner {
 
   companion object {
     private val IMPLEMENTATION_XML = Implementation(
-      PluralsFormatIssueDetector::class.java, ALL_RESOURCES_SCOPE
+      PluralsFormatIssueDetector::class.java,
+      ALL_RESOURCES_SCOPE
     )
     val UNMATCHED_PLURALS_FORMAT_PLACEHOLDERS: Issue = Issue.create(
       "UnmatchedPluralsPlaceholders",

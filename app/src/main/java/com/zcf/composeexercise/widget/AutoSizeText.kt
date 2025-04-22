@@ -44,7 +44,7 @@ fun AutoSizeText(
   maxLines: Int = Int.MAX_VALUE,
   minLines: Int = 1,
   style: TextStyle = LocalTextStyle.current,
-  constraint: AutoSizeConstraint = AutoSizeConstraint.Width(),
+  constraint: AutoSizeConstraint = AutoSizeConstraint.Width()
 ) {
   var textStyle by remember { mutableStateOf(style) }
   var readyToDraw by remember { mutableStateOf(false) }
@@ -117,7 +117,7 @@ fun AutoSizeText(
   maxLines: Int = Int.MAX_VALUE,
   minLines: Int = 1,
   style: TextStyle = LocalTextStyle.current,
-  constraint: AutoSizeConstraint = AutoSizeConstraint.Width(),
+  constraint: AutoSizeConstraint = AutoSizeConstraint.Width()
 ) {
   AutoSizeText(
     modifier = modifier,

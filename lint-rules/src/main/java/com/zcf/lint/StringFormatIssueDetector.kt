@@ -28,7 +28,6 @@ import org.jetbrains.uast.UCallExpression
 import org.w3c.dom.Element
 import java.util.EnumSet
 
-
 val placeholderRegex = Regex("%[12345]\\$[sd]")
 
 /**
@@ -100,7 +99,10 @@ class StringFormatIssueDetector : ResourceXmlDetector(), SourceCodeScanner {
         //   java.lang.String#format(String format, Object... formatArgs)
         //   java.lang.String#format(Locale locale, String format, Object... formatArgs)
         checkStringFormatCall(
-          context, method, node, method.parameterList.parametersCount == 3
+          context,
+          method,
+          node,
+          method.parameterList.parametersCount == 3
         )
       }
     } else {
@@ -118,11 +120,11 @@ class StringFormatIssueDetector : ResourceXmlDetector(), SourceCodeScanner {
       if (method.parameterList.parametersCount < 2) {
         return
       }
-      if (evaluator.isMemberInSubClassOf(method, SdkConstants.CLASS_RESOURCES, false)
-        || evaluator.isMemberInSubClassOf(method, SdkConstants.CLASS_CONTEXT, false)
-        || evaluator.isMemberInSubClassOf(method, SdkConstants.CLASS_FRAGMENT, false)
-        || evaluator.isMemberInSubClassOf(method, CLASS_V4_FRAGMENT.oldName(), false)
-        || evaluator.isMemberInSubClassOf(method, CLASS_V4_FRAGMENT.newName(), false)
+      if (evaluator.isMemberInSubClassOf(method, SdkConstants.CLASS_RESOURCES, false) ||
+        evaluator.isMemberInSubClassOf(method, SdkConstants.CLASS_CONTEXT, false) ||
+        evaluator.isMemberInSubClassOf(method, SdkConstants.CLASS_FRAGMENT, false) ||
+        evaluator.isMemberInSubClassOf(method, CLASS_V4_FRAGMENT.oldName(), false) ||
+        evaluator.isMemberInSubClassOf(method, CLASS_V4_FRAGMENT.newName(), false)
       ) {
         checkStringFormatCall(context, method, node, false)
       }
@@ -171,7 +173,8 @@ class StringFormatIssueDetector : ResourceXmlDetector(), SourceCodeScanner {
 
   companion object {
     val IMPLEMENTATION_XML = Implementation(
-      StringFormatIssueDetector::class.java, ALL_RESOURCES_SCOPE
+      StringFormatIssueDetector::class.java,
+      ALL_RESOURCES_SCOPE
     )
     val IMPLEMENTATION_XML_AND_JAVA = Implementation(
       StringFormatIssueDetector::class.java,

@@ -1,83 +1,79 @@
 package com.zcf.rxjava
 
 import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.subjects.PublishSubject
 import org.junit.Test
 import java.lang.IllegalStateException
 
 class OnErrorTest {
-    @Test
-    fun `onErrorReturnItem will complete merged observable`() {
+  @Test
+  fun `onErrorReturnItem will complete merged observable`() {
+    val source1 = PublishSubject.create<Int>()
+    val source2 = PublishSubject.create<String>()
 
-        val source1 = PublishSubject.create<Int>()
-        val source2 = PublishSubject.create<String>()
+    val observer = Observable.merge(source1, source2)
+      .onErrorReturnItem("x")
+      .test()
 
-        val observer = Observable.merge(source1, source2)
-            .onErrorReturnItem("x")
-            .test()
+    observer.assertNotComplete()
 
-        observer.assertNotComplete()
+    assert(observer.hasSubscription())
 
-        assert(observer.hasSubscription())
+    source1.onNext(1)
+    source2.onNext("a")
 
-        source1.onNext(1)
-        source2.onNext("a")
+    observer.assertValues(1, "a")
 
-        observer.assertValues(1, "a")
+    source1.onError(IllegalStateException("test error"))
+    source2.onNext("b")
+    observer.assertValues(1, "a", "x")
+    observer.assertComplete()
+  }
 
-        source1.onError(IllegalStateException("test error"))
-        source2.onNext("b")
-        observer.assertValues(1, "a", "x")
-        observer.assertComplete()
-    }
+  @Test
+  fun `onErrorReturnItem will complete observable`() {
+    val source1 = PublishSubject.create<Int>()
+    val observer = source1
+      .onErrorReturnItem(0)
+      .test()
 
-    @Test
-    fun `onErrorReturnItem will complete observable`() {
+    observer.assertNotComplete()
 
-        val source1 = PublishSubject.create<Int>()
-        val observer = source1
-            .onErrorReturnItem(0)
-            .test()
+    assert(observer.hasSubscription())
 
-        observer.assertNotComplete()
+    source1.onNext(1)
 
-        assert(observer.hasSubscription())
+    observer.assertValues(1)
 
-        source1.onNext(1)
+    source1.onError(IllegalStateException("test error"))
+    source1.onNext(2)
 
-        observer.assertValues(1)
+    observer.assertValues(1, 0)
+    observer.assertComplete()
+  }
 
-        source1.onError(IllegalStateException("test error"))
-        source1.onNext(2)
+  @Test
+  fun `onErrorReturnItem works for inside flatMap`() {
+    val source1 = PublishSubject.create<Int>()
+    val observer = Observable.just(1)
+      .flatMap {
+        source1
+      }
+      .onErrorReturnItem(1000)
+      .test()
 
-        observer.assertValues(1, 0)
-        observer.assertComplete()
-    }
+    observer.assertNotComplete()
 
-    @Test
-    fun `onErrorReturnItem works for inside flatMap`() {
+    assert(observer.hasSubscription())
 
-        val source1 = PublishSubject.create<Int>()
-        val observer = Observable.just(1)
-            .flatMap {
-                source1
-            }
-            .onErrorReturnItem(1000)
-            .test()
+    source1.onNext(1)
 
-        observer.assertNotComplete()
+    observer.assertValues(1)
 
-        assert(observer.hasSubscription())
+    source1.onError(IllegalStateException("test error"))
+    source1.onNext(2)
 
-        source1.onNext(1)
-
-        observer.assertValues(1)
-
-        source1.onError(IllegalStateException("test error"))
-        source1.onNext(2)
-
-        observer.assertValues(1, 1000)
-        observer.assertComplete()
-    }
+    observer.assertValues(1, 1000)
+    observer.assertComplete()
+  }
 }

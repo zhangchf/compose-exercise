@@ -40,77 +40,77 @@ import androidx.compose.ui.window.DialogWindowProvider
  */
 @Composable
 fun CustomAnimationDialog(
-    showDialog: Boolean,
-    onDismissRequest: () -> Unit,
-    content: @Composable () -> Unit
+  showDialog: Boolean,
+  onDismissRequest: () -> Unit,
+  content: @Composable () -> Unit
 ) {
-    var showAnimatedDialog by remember { mutableStateOf(false) }
+  var showAnimatedDialog by remember { mutableStateOf(false) }
 
-    LaunchedEffect(showDialog) {
-        if (showDialog) showAnimatedDialog = true
-    }
+  LaunchedEffect(showDialog) {
+    if (showDialog) showAnimatedDialog = true
+  }
 
-    println("zcf1 showDialog: $showDialog, showAnimatedDialog: $showAnimatedDialog")
-    if (showAnimatedDialog) {
-        Dialog(
-            onDismissRequest = onDismissRequest,
-            properties = DialogProperties(usePlatformDefaultWidth = false)
+  println("zcf1 showDialog: $showDialog, showAnimatedDialog: $showAnimatedDialog")
+  if (showAnimatedDialog) {
+    Dialog(
+      onDismissRequest = onDismissRequest,
+      properties = DialogProperties(usePlatformDefaultWidth = false)
+    ) {
+      (LocalView.current.parent as? DialogWindowProvider)?.window?.let { window ->
+        window.setWindowAnimations(-1)
+        window.setDimAmount(0f)
+      }
+
+      Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+      ) {
+        var animateIn by remember { mutableStateOf(false) }
+        LaunchedEffect(Unit) { animateIn = true }
+
+        AnimatedVisibility(
+          visible = animateIn && showDialog,
+          enter = fadeIn(),
+          exit = fadeOut()
         ) {
-            (LocalView.current.parent as? DialogWindowProvider)?.window?.let { window ->
-                window.setWindowAnimations(-1)
-                window.setDimAmount(0f)
-            }
-
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                var animateIn by remember { mutableStateOf(false) }
-                LaunchedEffect(Unit) { animateIn = true }
-
-                AnimatedVisibility(
-                    visible = animateIn && showDialog,
-                    enter = fadeIn(),
-                    exit = fadeOut()
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .pointerInput(Unit) { detectTapGestures { onDismissRequest() } }
-                            .background(Color.Black.copy(alpha = 0.56f))
-                            .fillMaxSize()
-                    )
-                }
-                AnimatedVisibility(
-                    visible = animateIn && showDialog,
-                    enter = fadeIn(spring(stiffness = Spring.StiffnessHigh)) + scaleIn(
-                        initialScale = 0.8f,
-                        animationSpec = spring(
-                            dampingRatio = Spring.DampingRatioMediumBouncy,
-                            stiffness = Spring.StiffnessMediumLow
-                        )
-                    ),
-                    exit = slideOutVertically { it/8 } + fadeOut() + scaleOut(targetScale = 0.95f)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .shadow(8.dp, shape = RoundedCornerShape(16.dp))
-                            .width(300.dp)
-                            .clip(RoundedCornerShape(16.dp))
-                            .background(MaterialTheme.colors.surface),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        content()
-                    }
-
-                    DisposableEffect(key1 = Unit) {
-                        println("zcf1 DisposableEffect")
-                        onDispose {
-                            println("zcf1 onDispose")
-                            showAnimatedDialog = false
-                        }
-                    }
-                }
-            }
+          Box(
+            modifier = Modifier
+              .pointerInput(Unit) { detectTapGestures { onDismissRequest() } }
+              .background(Color.Black.copy(alpha = 0.56f))
+              .fillMaxSize()
+          )
         }
+        AnimatedVisibility(
+          visible = animateIn && showDialog,
+          enter = fadeIn(spring(stiffness = Spring.StiffnessHigh)) + scaleIn(
+            initialScale = 0.8f,
+            animationSpec = spring(
+              dampingRatio = Spring.DampingRatioMediumBouncy,
+              stiffness = Spring.StiffnessMediumLow
+            )
+          ),
+          exit = slideOutVertically { it / 8 } + fadeOut() + scaleOut(targetScale = 0.95f)
+        ) {
+          Box(
+            modifier = Modifier
+              .shadow(8.dp, shape = RoundedCornerShape(16.dp))
+              .width(300.dp)
+              .clip(RoundedCornerShape(16.dp))
+              .background(MaterialTheme.colors.surface),
+            contentAlignment = Alignment.Center
+          ) {
+            content()
+          }
+
+          DisposableEffect(key1 = Unit) {
+            println("zcf1 DisposableEffect")
+            onDispose {
+              println("zcf1 onDispose")
+              showAnimatedDialog = false
+            }
+          }
+        }
+      }
     }
+  }
 }

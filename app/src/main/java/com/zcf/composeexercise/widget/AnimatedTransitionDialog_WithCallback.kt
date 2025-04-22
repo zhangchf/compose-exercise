@@ -39,56 +39,56 @@ private const val DIALOG_BUILD_TIME = 0L
  */
 @Composable
 fun AnimatedTransitionDialogWithCallback(
-    onDismissRequest: () -> Unit,
-    enter: EnterTransition = fadeIn() + expandIn(),
-    exit: ExitTransition = shrinkOut() + fadeOut(),
-    animationDuration: Int = ANIMATION_DURATION,
-    content: @Composable (dismissCallback: suspend () -> Unit) -> Unit
+  onDismissRequest: () -> Unit,
+  enter: EnterTransition = fadeIn() + expandIn(),
+  exit: ExitTransition = shrinkOut() + fadeOut(),
+  animationDuration: Int = ANIMATION_DURATION,
+  content: @Composable (dismissCallback: suspend () -> Unit) -> Unit
 ) {
-    val coroutineScope = rememberCoroutineScope()
-    var animatedVisible by remember { mutableStateOf(false) }
+  val coroutineScope = rememberCoroutineScope()
+  var animatedVisible by remember { mutableStateOf(false) }
 
-    suspend fun dismissCallback() {
-        animatedVisible = false
-        delay(animationDuration.toLong())
-        onDismissRequest()
+  suspend fun dismissCallback() {
+    animatedVisible = false
+    delay(animationDuration.toLong())
+    onDismissRequest()
+  }
+
+  LaunchedEffect(Unit) {
+    launch {
+      delay(DIALOG_BUILD_TIME)
+      animatedVisible = true
     }
+  }
 
-    LaunchedEffect(Unit) {
-        launch {
-            delay(DIALOG_BUILD_TIME)
-            animatedVisible = true
-        }
-    }
-
-    Dialog(
-        onDismissRequest = {
-            coroutineScope.launch { dismissCallback() }
-        },
-        properties = DialogProperties(usePlatformDefaultWidth = false)
+  Dialog(
+    onDismissRequest = {
+      coroutineScope.launch { dismissCallback() }
+    },
+    properties = DialogProperties(usePlatformDefaultWidth = false)
+  ) {
+    Box(
+      modifier = Modifier.fillMaxSize(),
+      contentAlignment = Alignment.BottomCenter
     ) {
+      AnimatedVisibility(
+        visible = animatedVisible,
+        enter = enter,
+        exit = exit
+      ) {
         Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.BottomCenter
+          modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = 200.dp)
+            .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp))
+            .background(Colors.windowBackground),
+          contentAlignment = Alignment.Center
         ) {
-            AnimatedVisibility(
-                visible = animatedVisible,
-                enter = enter,
-                exit = exit
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(min = 200.dp)
-                        .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp))
-                        .background(Colors.windowBackground),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CompositionLocalProvider(LocalContentColor provides Colors.gray3Solid) {
-                        content(::dismissCallback)
-                    }
-                }
-            }
+          CompositionLocalProvider(LocalContentColor provides Colors.gray3Solid) {
+            content(::dismissCallback)
+          }
         }
+      }
     }
+  }
 }

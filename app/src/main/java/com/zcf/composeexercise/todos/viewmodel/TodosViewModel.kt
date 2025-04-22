@@ -14,11 +14,10 @@ import javax.inject.Inject
 @HiltViewModel
 class TodosViewModel @Inject constructor(
   private val todoService: TodoService
-): ViewModel() {
+) : ViewModel() {
 
   val _todos = mutableStateListOf<Todo>()
   val todos: List<Todo> = _todos
-
 
   val _errorMsg = mutableStateOf<String>("")
   val errorMsg: State<String> = _errorMsg

@@ -16,6 +16,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import com.zcf.composeexercise.ui.theme.Colors
 
 const val TAG = "ClickableSpanText"
+
 /**
  * A clickable text with 1-2 clickable spans. Span text must exist in original text.
  *

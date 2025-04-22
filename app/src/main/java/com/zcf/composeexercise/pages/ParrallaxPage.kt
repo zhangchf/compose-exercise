@@ -25,62 +25,59 @@ import kotlin.math.min
 
 @Composable
 fun ParallaxPage() {
+  val scrollState = rememberScrollState()
 
-    val scrollState = rememberScrollState()
+  val threshold = with(LocalDensity.current) {
+    200.dp.toPx()
+  }
 
-    val threshold = with(LocalDensity.current) {
-        200.dp.toPx()
+  Box() {
+    Column(
+      modifier = Modifier
+        .fillMaxWidth()
+        .verticalScroll(scrollState)
+    ) {
+      Box(
+        modifier = Modifier
+          .fillMaxWidth()
+          .height(500.dp)
+          .background(Color.White)
+          .graphicsLayer {
+            val scroll = scrollState.value.toFloat()
+            alpha = 0.5f + (0.5f - min(scroll, threshold) / threshold / 2)
+            translationY = scroll / 2f
+          }
+      ) {
+        Image(
+          painter = painterResource(id = R.drawable.sky_sea_mountain),
+          contentDescription = null,
+          alignment = Alignment.Center,
+          contentScale = ContentScale.Crop
+        )
+      }
+      Text(
+        text = stringResource(id = R.string.dummy_text_long),
+        modifier = Modifier.background(Color.White)
+      )
+      println("zcf ${stringResource(id = R.string.dummy_text_long)}")
     }
 
-    Box() {
-
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .verticalScroll(scrollState)
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(500.dp)
-                    .background(Color.White)
-                    .graphicsLayer {
-                        val scroll = scrollState.value.toFloat()
-                        alpha = 0.5f + (0.5f - min(scroll, threshold) / threshold / 2)
-                        translationY = scroll / 2f
-                    }
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.sky_sea_mountain),
-                    contentDescription = null,
-                    alignment = Alignment.Center,
-                    contentScale = ContentScale.Crop
-                )
-            }
-            Text(
-                text = stringResource(id = R.string.dummy_text_long),
-                modifier = Modifier.background(Color.White)
-            )
-            println("zcf ${stringResource(id = R.string.dummy_text_long)}")
-        }
-
-        Box(
-            modifier = Modifier
-                .alpha(min(1f, scrollState.value / threshold))
-                .fillMaxWidth()
-                .height(60.dp)
-                .background(Color.Yellow),
-            contentAlignment = Alignment.CenterStart
-        ) {
-            Text(
-                text = "Header Bar",
-                modifier = Modifier.padding(horizontal = 16.dp),
-                style = TextStyle(
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.W900
-                )
-            )
-        }
+    Box(
+      modifier = Modifier
+        .alpha(min(1f, scrollState.value / threshold))
+        .fillMaxWidth()
+        .height(60.dp)
+        .background(Color.Yellow),
+      contentAlignment = Alignment.CenterStart
+    ) {
+      Text(
+        text = "Header Bar",
+        modifier = Modifier.padding(horizontal = 16.dp),
+        style = TextStyle(
+          fontSize = 24.sp,
+          fontWeight = FontWeight.W900
+        )
+      )
     }
-
+  }
 }

@@ -6,32 +6,31 @@ import org.junit.Test
 
 class MoshiTestWithReflection {
 
-    data class RefModel1(
-        val name: String,
-        val age: Int
-    )
+  data class RefModel1(
+    val name: String,
+    val age: Int
+  )
 
-    data class RefModel2(
-        val name: String,
-        val age: Int,
-        val isValid: Boolean = false,
-        val newStringField: String = "",
-        val newDoubleField: Double = 0.0
-    )
+  data class RefModel2(
+    val name: String,
+    val age: Int,
+    val isValid: Boolean = false,
+    val newStringField: String = "",
+    val newDoubleField: Double = 0.0
+  )
 
-    val moshi = Moshi.Builder().addLast(KotlinJsonAdapterFactory()).build()
+  val moshi = Moshi.Builder().addLast(KotlinJsonAdapterFactory()).build()
 
-    @Test
-    fun `Deserialize on in-existed fields`() {
-        val model1 = RefModel1("test", 12)
+  @Test
+  fun `Deserialize on in-existed fields`() {
+    val model1 = RefModel1("test", 12)
 
-        val model1Adapter = moshi.adapter(RefModel1::class.java)
-        val model1Json = model1Adapter.toJson(model1)
-        println(model1Json)
+    val model1Adapter = moshi.adapter(RefModel1::class.java)
+    val model1Json = model1Adapter.toJson(model1)
+    println(model1Json)
 
-        val model2Adapter = moshi.adapter(RefModel2::class.java)
-        val model2 = model2Adapter.fromJson(model1Json)
-        println(model2)
-    }
-
+    val model2Adapter = moshi.adapter(RefModel2::class.java)
+    val model2 = model2Adapter.fromJson(model1Json)
+    println(model2)
+  }
 }

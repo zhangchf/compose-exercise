@@ -3,7 +3,6 @@ package com.zcf.composeexercise.widget
 import android.graphics.Paint
 import android.text.Annotation
 import android.text.Spannable
-import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.text.SpannedString
 import android.text.method.LinkMovementMethod
@@ -111,7 +110,6 @@ fun TextView.setTextWithClickableSpan(
   }
   movementMethod = LinkMovementMethod.getInstance()
 }
-
 
 /**
  * Set text with bullet spans.

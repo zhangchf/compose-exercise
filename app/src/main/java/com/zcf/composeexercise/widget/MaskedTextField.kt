@@ -47,9 +47,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zcf.composeexercise.ui.theme.Colors
 import com.zcf.composeexercise.ui.theme.TextStyles
-import kotlinx.coroutines.delay
 import com.zcf.composeexercise.widget.MaskedTextFieldInputType.Digit
 import com.zcf.composeexercise.widget.MaskedTextFieldInputType.LetterOrDigit
+import kotlinx.coroutines.delay
 
 // To hide Selections in TextField
 val HiddenTextSelectionColors = TextSelectionColors(

@@ -10,28 +10,27 @@ import org.junit.Test
 
 class FlowTest {
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @Test
-    fun `flow operate sequentially`() = runTest {
-        println("TestScope begin")
-        var mapCount = 0
-        var firstOrNullCount = 0
+  @OptIn(ExperimentalCoroutinesApi::class)
+  @Test
+  fun `flow operate sequentially`() = runTest {
+    println("TestScope begin")
+    var mapCount = 0
+    var firstOrNullCount = 0
 
-        flowOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-            .map {
-                mapCount++
-                println("map: $it")
-                it
-            }
-            .firstOrNull {
-                firstOrNullCount++
-                println("firstOrNull: $it")
-                it == 3
-            }
+    flowOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+      .map {
+        mapCount++
+        println("map: $it")
+        it
+      }
+      .firstOrNull {
+        firstOrNullCount++
+        println("firstOrNull: $it")
+        it == 3
+      }
 
-        Assert.assertEquals(mapCount, 3)
-        Assert.assertEquals(firstOrNullCount, 3)
-        println("TestScope end")
-    }
-
+    Assert.assertEquals(mapCount, 3)
+    Assert.assertEquals(firstOrNullCount, 3)
+    println("TestScope end")
+  }
 }

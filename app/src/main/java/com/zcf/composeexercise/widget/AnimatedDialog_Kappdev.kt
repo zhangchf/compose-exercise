@@ -32,55 +32,55 @@ import kotlinx.coroutines.launch
  */
 @Composable
 fun AnimatedDialog(
-    onDismiss: () -> Unit,
-    inAnimDuration: Int = 720,
-    outAnimDuration: Int = 450,
-    properties: DialogProperties = DialogProperties(),
-    content: @Composable (triggerDismiss: () -> Unit) -> Unit,
+  onDismiss: () -> Unit,
+  inAnimDuration: Int = 720,
+  outAnimDuration: Int = 450,
+  properties: DialogProperties = DialogProperties(),
+  content: @Composable (triggerDismiss: () -> Unit) -> Unit
 ) {
-    val scope = rememberCoroutineScope()
-    var isDialogVisible by remember { mutableStateOf(false) }
-    val animationSpec = tween<Float>(if (isDialogVisible) inAnimDuration else outAnimDuration)
+  val scope = rememberCoroutineScope()
+  var isDialogVisible by remember { mutableStateOf(false) }
+  val animationSpec = tween<Float>(if (isDialogVisible) inAnimDuration else outAnimDuration)
 
-    val dialogAlpha by animateFloatAsState(
-        targetValue = if (isDialogVisible) 1f else 0f,
-        animationSpec = animationSpec
-    )
+  val dialogAlpha by animateFloatAsState(
+    targetValue = if (isDialogVisible) 1f else 0f,
+    animationSpec = animationSpec
+  )
 
-    val dialogRotationX by animateFloatAsState(
-        targetValue = if (isDialogVisible) 0f else -90f,
-        animationSpec = animationSpec
-    )
+  val dialogRotationX by animateFloatAsState(
+    targetValue = if (isDialogVisible) 0f else -90f,
+    animationSpec = animationSpec
+  )
 
-    val dialogScale by animateFloatAsState(
-        targetValue = if (isDialogVisible) 1f else 0f,
-        animationSpec = animationSpec
-    )
+  val dialogScale by animateFloatAsState(
+    targetValue = if (isDialogVisible) 1f else 0f,
+    animationSpec = animationSpec
+  )
 
-    val dismissWithAnimation: () -> Unit = {
-        scope.launch {
-            isDialogVisible = false
-            delay(outAnimDuration.toLong())
-            onDismiss()
-        }
+  val dismissWithAnimation: () -> Unit = {
+    scope.launch {
+      isDialogVisible = false
+      delay(outAnimDuration.toLong())
+      onDismiss()
     }
+  }
 
-    LaunchedEffect(Unit) {
-        isDialogVisible = true
-    }
+  LaunchedEffect(Unit) {
+    isDialogVisible = true
+  }
 
-    Dialog(
-        onDismissRequest = dismissWithAnimation,
-        properties = properties
-    ) {
-        Box(
-            modifier = Modifier
-                .alpha(dialogAlpha)
-                .scale(dialogScale)
-                .graphicsLayer { rotationX = dialogRotationX },
-            content = {
-                content(dismissWithAnimation)
-            }
-        )
-    }
+  Dialog(
+    onDismissRequest = dismissWithAnimation,
+    properties = properties
+  ) {
+    Box(
+      modifier = Modifier
+        .alpha(dialogAlpha)
+        .scale(dialogScale)
+        .graphicsLayer { rotationX = dialogRotationX },
+      content = {
+        content(dismissWithAnimation)
+      }
+    )
+  }
 }

@@ -6,6 +6,5 @@ import androidx.navigation.NavController
 
 @Composable
 fun TodoItem(itemId: Int?, navController: NavController) {
-  
   Text(text = "Todo Item: $itemId")
 }
