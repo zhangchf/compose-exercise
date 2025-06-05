@@ -20,17 +20,18 @@ import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.zcf.composeexercise.R
 import com.zcf.composeexercise.utils.toPx
 import com.zcf.composeexercise.widget.BulletSpanText
+import com.zcf.composeexercise.widget.JumpyRow
 import com.zcf.composeexercise.widget.setTextWithBulletSpan
 
 @Composable
 fun Texts() {
-  val density = LocalDensity.current
   Column {
     AndroidView(
       factory = { context ->
@@ -46,28 +47,48 @@ fun Texts() {
       modifier = Modifier.padding(20.dp)
     )
 
-    Box(
-      modifier = Modifier.padding(20.dp)
-    ) {
-      val text = "A text with border    i     .     ,  9 ITEMS"
-      val fontSize = 20.sp
-      val style = TextStyle(fontSize = fontSize)
-      Text(
-        text = text,
-        color = Color.Black,
-        style = style.copy(
-          drawStyle = Stroke(
-            width = fontSize.toPx(density)*2/3,
-            join = StrokeJoin.Round
-          )
+    TextWithCurlyCharacterShapedBorder()
+
+    JumpyRow {
+      "Jump Compose".forEach {
+        Text(
+          text = it.toString(),
+          color = Color.Blue,
+          fontWeight = FontWeight.Bold,
+          fontSize = 32.sp
+        )
+      }
+    }
+
+  }
+}
+
+/*
+Text with curly character-shaped border
+ */
+@Composable
+fun TextWithCurlyCharacterShapedBorder() {
+  val density = LocalDensity.current
+  Box(
+    modifier = Modifier.padding(20.dp)
+  ) {
+    val text = "A text with border    i     .     ,  9 ITEMS"
+    val fontSize = 20.sp
+    val style = TextStyle(fontSize = fontSize)
+    Text(
+      text = text,
+      color = Color.Black,
+      style = style.copy(
+        drawStyle = Stroke(
+          width = fontSize.toPx(density)*2/3,
+          join = StrokeJoin.Round
         )
       )
-      Text(
-        text = text,
-        color = Color.Red,
-        style = style
-      )
-
-    }
+    )
+    Text(
+      text = text,
+      color = Color.Red,
+      style = style
+    )
   }
 }
