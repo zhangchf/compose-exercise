@@ -71,6 +71,7 @@ dependencies {
   implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7")
   implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.7")
 
+  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.1")
 
   implementation("com.google.dagger:hilt-android:2.51.1")

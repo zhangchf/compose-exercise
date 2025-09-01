@@ -1,5 +1,6 @@
 package com.zcf.rxjava
 
+import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import org.junit.Test
 
@@ -17,6 +18,15 @@ class ObservableTest {
     source1.onNext(3)
 
     observer.assertValues(1)
+    observer.assertComplete()
+  }
+
+  @Test
+  fun startWith() {
+    val source1 = Observable.just(1, 2, 3).startWithItem(11).startWithItem(22)
+
+    val observer = source1.test()
+    observer.assertValues(22, 11, 1, 2, 3)
     observer.assertComplete()
   }
 }
