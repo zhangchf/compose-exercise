@@ -12,7 +12,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.*
 import androidx.navigation.compose.composable
@@ -26,8 +26,8 @@ fun MainScreen(navController: NavController) {
   Scaffold(
     topBar = {
       TopAppBar {
-//                Text(text = stringResource(id = R.string.mainScreenTitle))
-        Text(text = pluralStringResource(id = R.plurals.ordersCounter, 1000))
+        Text(text = stringResource(id = com.zcf.resources.R.string.textFromResourcesModule))
+//        Text(text = pluralStringResource(id = R.plurals.ordersCounter, 1000))
       }
     }
   ) { paddingValues ->

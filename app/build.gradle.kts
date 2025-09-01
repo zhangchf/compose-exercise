@@ -106,6 +106,8 @@ dependencies {
   implementation("io.coil-kt:coil-compose:2.6.0")
   implementation("io.coil-kt:coil-gif:2.6.0")
 
+  implementation(project(":submodule"))
+
   testImplementation("junit:junit:4.13.2")
   androidTestImplementation("androidx.test.ext:junit:1.2.1")
   androidTestImplementation("androidx.test.ext:junit-ktx:1.2.1")

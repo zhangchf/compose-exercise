@@ -15,3 +15,5 @@ dependencyResolutionManagement {
 rootProject.name = "ComposeExcersise"
 include(":app")
 include(":lint-rules")
+include(":resources")
+include(":submodule")
