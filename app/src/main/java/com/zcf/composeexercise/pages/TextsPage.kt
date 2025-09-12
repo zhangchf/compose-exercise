@@ -9,14 +9,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.PathEffect
-import androidx.compose.ui.graphics.Shadow
-import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
-import androidx.compose.ui.graphics.drawscope.DrawStyle
-import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
@@ -59,7 +53,6 @@ fun Texts() {
         )
       }
     }
-
   }
 }
 
@@ -80,7 +73,7 @@ fun TextWithCurlyCharacterShapedBorder() {
       color = Color.Black,
       style = style.copy(
         drawStyle = Stroke(
-          width = fontSize.toPx(density)*2/3,
+          width = fontSize.toPx(density) * 2 / 3,
           join = StrokeJoin.Round
         )
       )
