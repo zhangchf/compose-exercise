@@ -71,7 +71,7 @@ fun BottomSheetScaffoldPage() {
       BottomSheetContent(pageState)
     },
     scaffoldState = scaffoldState,
-    sheetGesturesEnabled = false,
+    sheetGesturesEnabled = true,
     sheetPeekHeight = 0.dp
   ) {
     Column {

@@ -130,7 +130,7 @@ fun NavGraphBuilder.mainScreenNavGraph(navController: NavController) {
       AnimationPage()
     }
     composable(MainScreenRoutes.BackdropScaffold.key) {
-      backdropScaffoldPage()
+      BackdropScaffoldPage()
     }
     composable(MainScreenRoutes.MirrorPage.key) {
       MirrorPage()

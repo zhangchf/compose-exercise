@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun backdropScaffoldPage() {
+fun BackdropScaffoldPage() {
   val scope = rememberCoroutineScope()
   val selection = remember { mutableStateOf(1) }
   val scaffoldState = rememberBackdropScaffoldState(BackdropValue.Concealed)
