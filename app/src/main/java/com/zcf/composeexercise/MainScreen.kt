@@ -79,7 +79,8 @@ enum class MainScreenRoutes(val key: String, val displayName: String) {
   AnimatedTransitionDialog("animatedTransitionDialog", "Animated Transition Dialog"),
   NegativePaddingsPage("negativePaddings", "Negative Paddings"),
   PhotoHarvestingPage("photoHarvesting", "Photo Harvesting"),
-  BottomSheetScaffold("bottomSheetScaffold", "BottomSheetScaffold")
+  BottomSheetScaffold("bottomSheetScaffold", "BottomSheetScaffold"),
+  BottomSheetDialogByScaffold("bottomSheetDialogByScaffold", "BottomSheetDialog by Scaffold")
 }
 
 fun NavGraphBuilder.mainScreenNavGraph(navController: NavController) {
@@ -155,6 +156,13 @@ fun NavGraphBuilder.mainScreenNavGraph(navController: NavController) {
     }
     composable(MainScreenRoutes.BottomSheetScaffold.key) {
       BottomSheetScaffoldPage()
+    }
+    composable(MainScreenRoutes.BottomSheetDialogByScaffold.key) {
+      BottomSheetDialogByScaffold(
+        onBack = {
+          navController.popBackStack()
+        }
+      )
     }
   }
 }

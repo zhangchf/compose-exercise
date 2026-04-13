@@ -5,6 +5,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -21,12 +22,15 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.BottomSheetScaffold
+import androidx.compose.material.BottomSheetValue
 import androidx.compose.material.Button
 import androidx.compose.material.Divider
 import androidx.compose.material.Text
 import androidx.compose.material.rememberBottomSheetScaffoldState
+import androidx.compose.material.rememberBottomSheetState
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -36,6 +40,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextRange
@@ -54,6 +59,84 @@ private enum class PageState {
   Scaffold1, Scaffold2
 }
 
+/**
+ * Bottom sheet dialog implemented by bottom sheet scaffold.
+ * The main page is transparent and click on it to collapse the bottom sheet.
+ */
+@Composable
+fun BottomSheetDialogByScaffold(
+  onBack: () -> Unit
+) {
+  val scope = rememberCoroutineScope()
+  val scaffoldState = rememberBottomSheetScaffoldState(
+    bottomSheetState = rememberBottomSheetState(BottomSheetValue.Expanded)
+  )
+  var pageState by remember { mutableStateOf(PageState.Scaffold1) }
+
+  val isSheetCollapsed by remember {
+    derivedStateOf { scaffoldState.bottomSheetState.isCollapsed }
+  }
+
+  LaunchedEffect(isSheetCollapsed) {
+    if (isSheetCollapsed) {
+      onBack()
+    }
+  }
+
+  /**
+   * Need handle back dispatcher when use Controller:
+   * ```
+   *   override fun handleBack(): Boolean {
+   *     val onBackPressedDispatcher = (this.activity as ComponentActivity).onBackPressedDispatcher
+   *     if (onBackPressedDispatcher.hasEnabledCallbacks()) {
+   *       onBackPressedDispatcher.onBackPressed()
+   *       return true
+   *     } else {
+   *       return super.handleBack()
+   *     }
+   *   }
+   * ```
+   */
+  BackHandler {
+    scope.launch {
+      scaffoldState.bottomSheetState.collapse()
+    }
+  }
+
+  BottomSheetScaffold(
+    sheetContent = {
+      Column(
+        modifier = Modifier.fillMaxHeight(0.9f)
+      ) {
+        BottomSheetContent(pageState)
+      }
+    },
+    scaffoldState = scaffoldState,
+    sheetGesturesEnabled = true,
+    sheetPeekHeight = 0.dp,
+    backgroundColor = Colors.background50
+  ) {
+    Box(
+      Modifier
+        .fillMaxSize()
+        .background(Color.Transparent)
+        .clickable(
+          interactionSource = remember { MutableInteractionSource() },
+          indication = null
+        ) {
+          scope.launch {
+            scaffoldState.bottomSheetState.collapse()
+          }
+        }
+    )
+  }
+}
+
+/**
+ * Bottom sheet scaffold example with multiple page states.
+ * You can open different bottom sheet content by clicking different buttons on the main page.
+ * And you can press back to close the bottom sheet.
+ */
 @Composable
 fun BottomSheetScaffoldPage() {
   val scope = rememberCoroutineScope()
